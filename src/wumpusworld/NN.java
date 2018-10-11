@@ -27,4 +27,12 @@ public class NN {
             this.weights[0][i] = 2 * this.random.nextDouble() - 1;
         }
     }
+    
+    private double sigmoid(double x) {
+            return 1 / ( 1 + Math.pow(Math.E,(-1*x)));
+    }
+    
+    private double sigmoidDerivative(double x) {
+        return x * (1 - x);
+    }
 }

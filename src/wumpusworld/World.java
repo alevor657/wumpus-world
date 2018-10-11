@@ -49,6 +49,86 @@ public class World
     public static final String A_TURN_RIGHT = "r";
     
     /**
+     * =========================================================================
+     */
+    
+    public void goDown() {
+        if (this.isValidPosition(this.getPlayerX(), this.getPlayerY() - 1)) {
+            if (this.getDirection() == this.DIR_DOWN) {
+                this.doAction(this.A_MOVE);
+            } else if (this.getDirection() == this.DIR_RIGHT) {
+                this.doAction(this.A_TURN_RIGHT);
+                this.doAction(this.A_MOVE);
+            } else if (this.getDirection() == this.DIR_LEFT) {
+                this.doAction(this.A_TURN_LEFT);
+                this.doAction(this.A_MOVE);
+            } else if (this.getDirection() == this.DIR_UP) {
+                this.doAction(this.A_TURN_LEFT);
+                this.doAction(this.A_TURN_LEFT);
+                this.doAction(this.A_MOVE);
+            }
+        }
+    }
+    
+    public void goRight() {
+        if (this.isValidPosition(this.getPlayerX() + 1, this.getPlayerY())) {
+            if (this.getDirection() == this.DIR_DOWN) {
+                this.doAction(this.A_TURN_LEFT);
+                this.doAction(this.A_MOVE);
+            } else if (this.getDirection() == this.DIR_RIGHT) {
+                this.doAction(this.A_MOVE);
+            } else if (this.getDirection() == this.DIR_LEFT) {
+                this.doAction(this.A_TURN_LEFT);
+                this.doAction(this.A_TURN_LEFT);
+                this.doAction(this.A_MOVE);
+            } else if (this.getDirection() == this.DIR_UP) {
+                this.doAction(this.A_TURN_RIGHT);
+                this.doAction(this.A_MOVE);
+            }
+        }
+    }
+    
+    public void goUp() {
+        if (this.isValidPosition(this.getPlayerX(), this.getPlayerY() + 1)) {
+            if (this.getDirection() == this.DIR_DOWN) {
+                this.doAction(this.A_TURN_LEFT);
+                this.doAction(this.A_TURN_LEFT);
+                this.doAction(this.A_MOVE);
+            } else if (this.getDirection() == this.DIR_RIGHT) {
+                this.doAction(this.A_TURN_LEFT);
+                this.doAction(this.A_MOVE);
+            } else if (this.getDirection() == this.DIR_LEFT) {
+                this.doAction(this.A_TURN_RIGHT);
+                this.doAction(this.A_MOVE);
+            } else if (this.getDirection() == this.DIR_UP) {
+                this.doAction(this.A_MOVE);
+            }
+        }
+    }
+    
+    public void goLeft() {
+        if (this.isValidPosition(this.getPlayerX() - 1, this.getPlayerY())) {
+            if (this.getDirection() == this.DIR_DOWN) {
+                this.doAction(this.A_TURN_RIGHT);
+                this.doAction(this.A_MOVE);
+            } else if (this.getDirection() == this.DIR_RIGHT) {
+                this.doAction(this.A_TURN_LEFT);
+                this.doAction(this.A_TURN_LEFT);
+                this.doAction(this.A_MOVE);
+            } else if (this.getDirection() == this.DIR_LEFT) {
+                this.doAction(this.A_MOVE);
+            } else if (this.getDirection() == this.DIR_UP) {
+                this.doAction(this.A_TURN_LEFT);
+                this.doAction(this.A_MOVE);
+            }
+        }
+    }
+    
+    /**
+     * =========================================================================
+     */
+    
+    /**
      * Creates a new Wumpus World. The Wumpus World works with
      * any size 4 or larger, but only size 4 is supported by
      * the GUI.
