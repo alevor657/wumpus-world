@@ -6,6 +6,8 @@
 package wumpusworld;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -15,7 +17,7 @@ import java.util.Random;
 public class Q {
     private int actionSize;
     private int stateSize;
-    Integer[][] qTable;
+    Double[][] qTable;
     int epochs;
     double lerningRate;
     int maxSteps = 99;
@@ -37,13 +39,18 @@ public class Q {
         this.lerningRate = learningRate;
         this.world = w;
         
-        this.qTable = new Integer[this.actionSize][this.stateSize];
+        this.qTable = new Double[this.actionSize][this.stateSize];
+        
+        for (int j = 0; j < this.qTable.length; j++) {
+            Arrays.fill(this.qTable[j], 0.0);
+        }
+        
         this.rewards = new ArrayList<>();
     }
     
     public void train() {
         for (int i = 0; i < this.epochs; i++) {
-            World newWorld = this.world.cloneWorld();
+            World world = this.world.cloneWorld();
                         
             for (int k = 0; k < this.maxSteps; k++) {
                 Random r = new Random();
@@ -55,9 +62,10 @@ public class Q {
                     action = 1;
                 } else {
                     // Update new world
-                    action = this.getValidRandomMove(newWorld);
+                    action = this.getValidRandomMove(world);
                 }
                 
+                World newWorld = world.cloneWorld();
                 int score1 = newWorld.getScore();
                 
                 switch (action) {
@@ -76,18 +84,23 @@ public class Q {
                 }
                 
                 int score2 = newWorld.getScore();
-                int reward = score2 - score1;
+                double reward = score2 - score1;
+                
+                int stateIndex = world.getPlayerX() * world.getPlayerY();
+                int newStateIndex = newWorld.getPlayerX() * newWorld.getPlayerY();
+                double prevValue = this.qTable[stateIndex][action];
+                double max = Collections.max(Arrays.asList(this.qTable[newStateIndex]));
+                
+                this.qTable[stateIndex][action] = prevValue + this.lerningRate * (reward + this.gamma * max - prevValue);
+                
+                world = newWorld;
                 
                 if (newWorld.gameOver()) {
                     break;
                 }
-                
-                
-                
-//              
             }
             
-            
+            this.epsilon = this.minEpsilon + (this.maxEpsilon - this.minEpsilon) * Math.exp(-1 * this.decayRate * i);
         }
     }
     
