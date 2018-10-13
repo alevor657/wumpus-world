@@ -1,7 +1,13 @@
 package wumpusworld;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Contains starting code for creating your own Wumpus World agent.
@@ -41,16 +47,41 @@ public class MyAgent implements Agent
     public void doAction()
     {
         
-        Q q = new Q(16, 4, 25, 0.1, this.w);
-        q.train();
-        System.out.println("Trained!");
-        Double[][] table = q.qTable;
+//        Q q = new Q(16, 4, 10000, 0.1, this.w);
+//        try {
+//            q.train();
+//        } catch (IOException ex) {
+//            Logger.getLogger(MyAgent.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        System.out.println("Trained!");
+//        Double[][] table = q.qTable;
+//        
+//        int stateIndex = (this.w.getPlayerX() - 1) * 4 + this.w.getPlayerY();
+//        double max = Collections.max(Arrays.asList(table[stateIndex]));
+//        int action = Arrays.asList(table[stateIndex]).indexOf(max);
+//        System.out.println(Double.MIN_VALUE + "===========");
+//        this.printTable(table);
+//        switch (action) {
+//                    case 0:
+//                        this.w.goDown();
+//                        break;
+//                    case 1:
+//                        this.w.goRight();
+//                        break;
+//                    case 2:
+//                        this.w.goUp();
+//                        break;
+//                    case 3:
+//                        this.w.goLeft();
+//                        break;
+//                }
+        Double[][] qtable = this.readTable();
         
         int stateIndex = (this.w.getPlayerX() - 1) * 4 + this.w.getPlayerY();
-        double max = Collections.max(Arrays.asList(table[stateIndex]));
-        int action = Arrays.asList(table[stateIndex]).indexOf(max);
+        double max = Collections.max(Arrays.asList(qtable[stateIndex]));
+        int action = Arrays.asList(qtable[stateIndex]).indexOf(max);
         System.out.println(Double.MIN_VALUE + "===========");
-        this.printTable(table);
+        this.printTable(qtable);
         switch (action) {
                     case 0:
                         this.w.goDown();
@@ -65,91 +96,32 @@ public class MyAgent implements Agent
                         this.w.goLeft();
                         break;
                 }
+    }
+    
+    private Double[][] readTable() {
+        ObjectInputStream objectinputstream = null;
         
+        Double[][] qTable = null;
         
+        try {
+            File in = new File(System.getProperty("user.dir") + "qTable.ser");
+            FileInputStream streamIn = new FileInputStream(in);
+            objectinputstream = new ObjectInputStream(streamIn);
+            qTable = (Double[][]) objectinputstream.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if(objectinputstream != null){
+                try {
+                    objectinputstream .close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MyAgent.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } 
+        }
         
-        
-        
-//        NN n = new NN(3);
-//        System.out.println(n.weights);
-//        //Location of the player
-//        int cX = w.getPlayerX();
-//        int cY = w.getPlayerY();
-//        
-//        
-//        //Basic action:
-//        //Grab Gold if we can.
-//        if (w.hasGlitter(cX, cY))
-//        {
-//            w.doAction(World.A_GRAB);
-//            return;
-//        }
-//        
-//        //Basic action:
-//        //We are in a pit. Climb up.
-//        if (w.isInPit())
-//        {
-//            w.doAction(World.A_CLIMB);
-//            return;
-//        }
-//        
-//        //Test the environment
-//        if (w.hasBreeze(cX, cY))
-//        {
-//            System.out.println("I am in a Breeze");
-//        }
-//        if (w.hasStench(cX, cY))
-//        {
-//            System.out.println("I am in a Stench");
-//        }
-//        if (w.hasPit(cX, cY))
-//        {
-//            System.out.println("I am in a Pit");
-//        }
-//        if (w.getDirection() == World.DIR_RIGHT)
-//        {
-//            System.out.println("I am facing Right");
-//        }
-//        if (w.getDirection() == World.DIR_LEFT)
-//        {
-//            System.out.println("I am facing Left");
-//        }
-//        if (w.getDirection() == World.DIR_UP)
-//        {
-//            System.out.println("I am facing Up");
-//        }
-//        if (w.getDirection() == World.DIR_DOWN)
-//        {
-//            System.out.println("I am facing Down");
-//        }
-//        
-//        //decide next move
-//        rnd = decideRandomMove();
-//        if (rnd==0)
-//        {
-//            w.doAction(World.A_TURN_LEFT);
-//            w.doAction(World.A_MOVE);
-//        }
-//        
-//        if (rnd==1)
-//        {
-//            w.doAction(World.A_MOVE);
-//        }
-//                
-//        if (rnd==2)
-//        {
-//            w.doAction(World.A_TURN_LEFT);
-//            w.doAction(World.A_TURN_LEFT);
-//            w.doAction(World.A_MOVE);
-//        }
-//                        
-//        if (rnd==3)
-//        {
-//            w.doAction(World.A_TURN_RIGHT);
-//            w.doAction(World.A_MOVE);
-//        }
-                
-    }    
+        return qTable;
+    }
     
      /**
      * Genertes a random instruction for the Agent.

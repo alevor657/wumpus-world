@@ -5,6 +5,10 @@
  */
 package wumpusworld;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,7 +52,7 @@ public class Q {
         this.rewards = new ArrayList<>();
     }
     
-    public void train() {
+    public void train() throws IOException {
         for (int i = 0; i < this.epochs; i++) {
             World world = this.world.cloneWorld();
             System.out.println("epoch : " + i);    
@@ -103,6 +107,23 @@ public class Q {
             
             this.epsilon = this.minEpsilon + (this.maxEpsilon - this.minEpsilon) * Math.exp(-1 * this.decayRate * i);
         }
+        
+        // Serialize
+        ObjectOutputStream oos = null;
+        FileOutputStream fout = null;
+        try {
+            File file = new File(System.getProperty("user.dir") + "qTable.ser");
+            fout = new FileOutputStream(file, true);
+            oos = new ObjectOutputStream(fout);
+            oos.writeObject(this.qTable);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if(oos != null){
+                oos.close();
+            } 
+        }
+
     }
     
     private int getValidRandomMove(World w) {
