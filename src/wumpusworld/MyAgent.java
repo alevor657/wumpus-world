@@ -1,5 +1,8 @@
 package wumpusworld;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 /**
  * Contains starting code for creating your own Wumpus World agent.
  * Currently the agent only make a random decision each turn.
@@ -20,6 +23,15 @@ public class MyAgent implements Agent
     {
         w = world;   
     }
+    
+    public void printTable(Double[][] t) {
+        for (int i = 0; i < t.length; i++) {
+            for (int j = 0; j < t[i].length; j++) {
+                System.out.print(t[i][j] + " ");
+            }
+            System.out.print("\n");
+        }
+    }
    
             
     /**
@@ -31,8 +43,28 @@ public class MyAgent implements Agent
         
         Q q = new Q(16, 4, 25, 0.1, this.w);
         q.train();
+        System.out.println("Trained!");
+        Double[][] table = q.qTable;
         
-        
+        int stateIndex = (this.w.getPlayerX() - 1) * 4 + this.w.getPlayerY();
+        double max = Collections.max(Arrays.asList(table[stateIndex]));
+        int action = Arrays.asList(table[stateIndex]).indexOf(max);
+        System.out.println(Double.MIN_VALUE + "===========");
+        this.printTable(table);
+        switch (action) {
+                    case 0:
+                        this.w.goDown();
+                        break;
+                    case 1:
+                        this.w.goRight();
+                        break;
+                    case 2:
+                        this.w.goUp();
+                        break;
+                    case 3:
+                        this.w.goLeft();
+                        break;
+                }
         
         
         

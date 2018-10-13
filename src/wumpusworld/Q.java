@@ -42,7 +42,7 @@ public class Q {
         this.qTable = new Double[this.actionSize][this.stateSize];
         
         for (int j = 0; j < this.qTable.length; j++) {
-            Arrays.fill(this.qTable[j], 0.0);
+            Arrays.fill(this.qTable[j], (double)Integer.MIN_VALUE);
         }
         
         this.rewards = new ArrayList<>();
@@ -51,15 +51,17 @@ public class Q {
     public void train() {
         for (int i = 0; i < this.epochs; i++) {
             World world = this.world.cloneWorld();
-                        
+            System.out.println("epoch : " + i);    
             for (int k = 0; k < this.maxSteps; k++) {
+                int stateIndex = (world.getPlayerX() - 1) * 4 + world.getPlayerY() - 1;
                 Random r = new Random();
                 double expTradeoff = r.nextDouble();
                 
                 int action;
                 
                 if (expTradeoff > this.epsilon) {
-                    action = 1;
+                    double actionValue = Collections.max(Arrays.asList(this.qTable[stateIndex]));
+                    action = Arrays.asList(this.qTable[stateIndex]).indexOf(actionValue);
                 } else {
                     // Update new world
                     action = this.getValidRandomMove(world);
@@ -86,8 +88,7 @@ public class Q {
                 int score2 = newWorld.getScore();
                 double reward = score2 - score1;
                 
-                int stateIndex = world.getPlayerX() * world.getPlayerY();
-                int newStateIndex = newWorld.getPlayerX() * newWorld.getPlayerY();
+                int newStateIndex = (newWorld.getPlayerX() - 1) * 4 + newWorld.getPlayerY() - 1 ;
                 double prevValue = this.qTable[stateIndex][action];
                 double max = Collections.max(Arrays.asList(this.qTable[newStateIndex]));
                 
