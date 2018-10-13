@@ -29,73 +29,67 @@ public class MyAgent implements Agent
     {
         w = world;   
     }
-    
-    public void printTable(Double[][] t) {
-        for (int i = 0; i < t.length; i++) {
-            for (int j = 0; j < t[i].length; j++) {
-                System.out.print(t[i][j] + " ");
-            }
-            System.out.print("\n");
-        }
-    }
    
             
     /**
      * Asks your solver agent to execute an action.
      */
-
     public void doAction()
     {
-        
-//        Q q = new Q(16, 4, 10000, 0.1, this.w);
-//        try {
-//            q.train();
-//        } catch (IOException ex) {
-//            Logger.getLogger(MyAgent.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        System.out.println("Trained!");
-//        Double[][] table = q.qTable;
-//        
-//        int stateIndex = (this.w.getPlayerX() - 1) * 4 + this.w.getPlayerY();
-//        double max = Collections.max(Arrays.asList(table[stateIndex]));
-//        int action = Arrays.asList(table[stateIndex]).indexOf(max);
-//        System.out.println(Double.MIN_VALUE + "===========");
-//        this.printTable(table);
-//        switch (action) {
-//                    case 0:
-//                        this.w.goDown();
-//                        break;
-//                    case 1:
-//                        this.w.goRight();
-//                        break;
-//                    case 2:
-//                        this.w.goUp();
-//                        break;
-//                    case 3:
-//                        this.w.goLeft();
-//                        break;
-//                }
+        this.doTurn();
+//        this.train();
+    }
+    
+    public void doTurn() {
         Double[][] qtable = this.readTable();
         
-        int stateIndex = (this.w.getPlayerX() - 1) * 4 + this.w.getPlayerY();
+        int stateIndex = (this.w.getPlayerX() - 1) * 4 + this.w.getPlayerY() - 1;
         double max = Collections.max(Arrays.asList(qtable[stateIndex]));
         int action = Arrays.asList(qtable[stateIndex]).indexOf(max);
-        System.out.println(Double.MIN_VALUE + "===========");
         this.printTable(qtable);
+        
         switch (action) {
-                    case 0:
-                        this.w.goDown();
-                        break;
-                    case 1:
-                        this.w.goRight();
-                        break;
-                    case 2:
-                        this.w.goUp();
-                        break;
-                    case 3:
-                        this.w.goLeft();
-                        break;
-                }
+            case 0:
+                System.out.println("Going down");
+                this.w.goDown();
+                break;
+            case 1:
+                System.out.println("Going right");
+                this.w.goRight();
+                break;
+            case 2:
+                System.out.println("Going up");
+                this.w.goUp();
+                break;
+            case 3:
+                System.out.println("Going left");
+                this.w.goLeft();
+                break;
+        }
+        
+        System.out.println(max);
+        
+        for (int i = 0; i < qtable[stateIndex].length; i++) {
+            System.out.print(qtable[stateIndex][i] + "  ");
+        }
+        
+        if (this.w.hasGlitter(this.w.getPlayerX(), this.w.getPlayerY())) {
+            this.w.doAction(this.w.A_GRAB);
+        }
+        
+        if (this.w.hasPit(this.w.getPlayerX(), this.w.getPlayerY())) {
+            this.w.doAction(this.w.A_CLIMB);
+        }
+    }
+    
+    private void train() {
+        Q q = new Q(16, 4, 20000, 0.1, this.w);
+        try {
+            q.train();
+        } catch (IOException ex) {
+            Logger.getLogger(MyAgent.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println("Trained!");
     }
     
     private Double[][] readTable() {
@@ -121,16 +115,16 @@ public class MyAgent implements Agent
         }
         
         return qTable;
+    }    
+    
+    public void printTable(Double[][] t) {
+        for (int i = 0; i < t.length; i++) {
+            System.out.print("row: " + i + "    ");
+            for (int j = 0; j < t[i].length; j++) {
+                System.out.print(t[i][j] + "  ");
+            }
+            System.out.print("\n");
+        }
     }
-    
-     /**
-     * Genertes a random instruction for the Agent.
-     */
-    public int decideRandomMove()
-    {
-      return (int)(Math.random() * 4);
-    }
-    
-    
 }
 

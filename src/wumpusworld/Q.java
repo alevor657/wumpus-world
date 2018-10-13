@@ -46,7 +46,7 @@ public class Q {
         this.qTable = new Double[this.actionSize][this.stateSize];
         
         for (int j = 0; j < this.qTable.length; j++) {
-            Arrays.fill(this.qTable[j], (double)Integer.MIN_VALUE);
+            Arrays.fill(this.qTable[j], -100000.0);
         }
         
         this.rewards = new ArrayList<>();
@@ -56,6 +56,7 @@ public class Q {
         for (int i = 0; i < this.epochs; i++) {
             World world = this.world.cloneWorld();
             System.out.println("epoch : " + i);    
+            
             for (int k = 0; k < this.maxSteps; k++) {
                 int stateIndex = (world.getPlayerX() - 1) * 4 + world.getPlayerY() - 1;
                 Random r = new Random();
@@ -89,6 +90,10 @@ public class Q {
                         break;
                 }
                 
+//                if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
+//                    newWorld.doAction(newWorld.A_GRAB);
+//                }
+                
                 int score2 = newWorld.getScore();
                 double reward = score2 - score1;
                 
@@ -108,7 +113,10 @@ public class Q {
             this.epsilon = this.minEpsilon + (this.maxEpsilon - this.minEpsilon) * Math.exp(-1 * this.decayRate * i);
         }
         
-        // Serialize
+        this.serializeQtable();
+    }
+    
+    private void serializeQtable() throws IOException {
         ObjectOutputStream oos = null;
         FileOutputStream fout = null;
         try {
@@ -123,7 +131,6 @@ public class Q {
                 oos.close();
             } 
         }
-
     }
     
     private int getValidRandomMove(World w) {
