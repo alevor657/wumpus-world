@@ -19,6 +19,7 @@ public class MyAgent implements Agent
 {
     private World w;
     int rnd;
+    Double[][] qtable = null;
     
     /**
      * Creates a new instance of your solver agent.
@@ -36,34 +37,45 @@ public class MyAgent implements Agent
      */
     public void doAction()
     {
-        this.doTurn();
-//        this.train();
+        this.train();
+        
+//        if (this.qtable == null) {
+//            this.qtable = this.readTable();
+//        }
+//        
+//        this.doTurn();
     }
     
     public void doTurn() {
-        Double[][] qtable = this.readTable();
+        Double[][] qtable = this.qtable;
         
         int stateIndex = (this.w.getPlayerX() - 1) * 4 + this.w.getPlayerY() - 1;
         double max = Collections.max(Arrays.asList(qtable[stateIndex]));
         int action = Arrays.asList(qtable[stateIndex]).indexOf(max);
+        
+//        qtable[stateIndex][action] -= 1.0;
         this.printTable(qtable);
         
         switch (action) {
             case 0:
-                System.out.println("Going down");
-                this.w.goDown();
+                System.out.println("GOING DOWN");
+                this.w.turnDown();
+                this.w.moveForward();
                 break;
             case 1:
-                System.out.println("Going right");
-                this.w.goRight();
+                System.out.println("GOING RIGHT");
+                this.w.turnRight();
+                this.w.moveForward();
                 break;
             case 2:
-                System.out.println("Going up");
-                this.w.goUp();
+                System.out.println("GOING UP");
+                this.w.turnUp();
+                this.w.moveForward();
                 break;
             case 3:
-                System.out.println("Going left");
-                this.w.goLeft();
+                System.out.println("GOING LEFT");
+                this.w.turnLeft();
+                this.w.moveForward();
                 break;
         }
         
@@ -83,7 +95,7 @@ public class MyAgent implements Agent
     }
     
     private void train() {
-        Q q = new Q(16, 4, 20000, 0.1, this.w);
+        Q q = new Q(16, 4, 10000, 0.1, this.w.cloneWorld());
         try {
             q.train();
         } catch (IOException ex) {
@@ -98,7 +110,8 @@ public class MyAgent implements Agent
         Double[][] qTable = null;
         
         try {
-            File in = new File(System.getProperty("user.dir") + "qTable.ser");
+            String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "QTables";
+            File in = new File(path, "qtable1.ser");
             FileInputStream streamIn = new FileInputStream(in);
             objectinputstream = new ObjectInputStream(streamIn);
             qTable = (Double[][]) objectinputstream.readObject();

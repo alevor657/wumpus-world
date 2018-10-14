@@ -52,75 +52,67 @@ public class World
      * =========================================================================
      */
     
-    public void goDown() {
+    public void turnDown() {
         if (this.isValidPosition(this.getPlayerX(), this.getPlayerY() - 1)) {
-            if (this.getDirection() == this.DIR_DOWN) {
-                this.doAction(this.A_MOVE);
-            } else if (this.getDirection() == this.DIR_RIGHT) {
+            if (this.getDirection() == this.DIR_RIGHT) {
                 this.doAction(this.A_TURN_RIGHT);
-                this.doAction(this.A_MOVE);
             } else if (this.getDirection() == this.DIR_LEFT) {
                 this.doAction(this.A_TURN_LEFT);
-                this.doAction(this.A_MOVE);
             } else if (this.getDirection() == this.DIR_UP) {
                 this.doAction(this.A_TURN_LEFT);
                 this.doAction(this.A_TURN_LEFT);
-                this.doAction(this.A_MOVE);
             }
         }
     }
     
-    public void goRight() {
+    public void turnRight() {
         if (this.isValidPosition(this.getPlayerX() + 1, this.getPlayerY())) {
             if (this.getDirection() == this.DIR_DOWN) {
                 this.doAction(this.A_TURN_LEFT);
-                this.doAction(this.A_MOVE);
-            } else if (this.getDirection() == this.DIR_RIGHT) {
-                this.doAction(this.A_MOVE);
             } else if (this.getDirection() == this.DIR_LEFT) {
                 this.doAction(this.A_TURN_LEFT);
                 this.doAction(this.A_TURN_LEFT);
-                this.doAction(this.A_MOVE);
             } else if (this.getDirection() == this.DIR_UP) {
                 this.doAction(this.A_TURN_RIGHT);
-                this.doAction(this.A_MOVE);
             }
         }
     }
     
-    public void goUp() {
+    public void turnUp() {
         if (this.isValidPosition(this.getPlayerX(), this.getPlayerY() + 1)) {
             if (this.getDirection() == this.DIR_DOWN) {
                 this.doAction(this.A_TURN_LEFT);
                 this.doAction(this.A_TURN_LEFT);
-                this.doAction(this.A_MOVE);
             } else if (this.getDirection() == this.DIR_RIGHT) {
                 this.doAction(this.A_TURN_LEFT);
-                this.doAction(this.A_MOVE);
             } else if (this.getDirection() == this.DIR_LEFT) {
                 this.doAction(this.A_TURN_RIGHT);
-                this.doAction(this.A_MOVE);
-            } else if (this.getDirection() == this.DIR_UP) {
-                this.doAction(this.A_MOVE);
             }
         }
     }
     
-    public void goLeft() {
+    public void turnLeft() {
         if (this.isValidPosition(this.getPlayerX() - 1, this.getPlayerY())) {
             if (this.getDirection() == this.DIR_DOWN) {
                 this.doAction(this.A_TURN_RIGHT);
-                this.doAction(this.A_MOVE);
             } else if (this.getDirection() == this.DIR_RIGHT) {
                 this.doAction(this.A_TURN_LEFT);
                 this.doAction(this.A_TURN_LEFT);
-                this.doAction(this.A_MOVE);
-            } else if (this.getDirection() == this.DIR_LEFT) {
-                this.doAction(this.A_MOVE);
-            } else if (this.getDirection() == this.DIR_UP) {
+            }  else if (this.getDirection() == this.DIR_UP) {
                 this.doAction(this.A_TURN_LEFT);
-                this.doAction(this.A_MOVE);
             }
+        }
+    }
+    
+    public void moveForward() {
+        this.doAction(A_MOVE);
+    }
+    
+    public void shootForward() {
+        if (this.hasArrow()) {
+            this.doAction(A_SHOOT);
+        } else {
+            System.out.println("NO ARROWS LEFT");
         }
     }
     
