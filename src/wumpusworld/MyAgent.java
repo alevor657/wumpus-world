@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -19,7 +20,7 @@ public class MyAgent implements Agent
 {
     private World w;
     int rnd;
-    Double[][] qtable = null;
+    ArrayList<ArrayList<Double>> qtable = null;
     
     /**
      * Creates a new instance of your solver agent.
@@ -37,23 +38,22 @@ public class MyAgent implements Agent
      */
     public void doAction()
     {
-        this.train();
+//        this.train();
         
-//        if (this.qtable == null) {
-//            this.qtable = this.readTable();
-//        }
-//        
-//        this.doTurn();
+        if (this.qtable == null) {
+            this.qtable = this.readTable();
+        }
+        
+        this.doTurn();
     }
     
     public void doTurn() {
-        Double[][] qtable = this.qtable;
+        ArrayList<ArrayList<Double>> qtable = this.qtable;
         
         int stateIndex = (this.w.getPlayerX() - 1) * 4 + this.w.getPlayerY() - 1;
-        double max = Collections.max(Arrays.asList(qtable[stateIndex]));
-        int action = Arrays.asList(qtable[stateIndex]).indexOf(max);
+        double max = Collections.max(qtable.get(stateIndex));
+        int action = qtable.get(stateIndex).indexOf(max);
         
-//        qtable[stateIndex][action] -= 1.0;
         this.printTable(qtable);
         
         switch (action) {
@@ -81,10 +81,6 @@ public class MyAgent implements Agent
         
         System.out.println(max);
         
-        for (int i = 0; i < qtable[stateIndex].length; i++) {
-            System.out.print(qtable[stateIndex][i] + "  ");
-        }
-        
         if (this.w.hasGlitter(this.w.getPlayerX(), this.w.getPlayerY())) {
             this.w.doAction(this.w.A_GRAB);
         }
@@ -104,17 +100,17 @@ public class MyAgent implements Agent
         System.out.println("Trained!");
     }
     
-    private Double[][] readTable() {
+    private ArrayList<ArrayList<Double>> readTable() {
         ObjectInputStream objectinputstream = null;
         
-        Double[][] qTable = null;
+        ArrayList<ArrayList<Double>> qTable = null;
         
         try {
             String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "QTables";
             File in = new File(path, "qtable1.ser");
             FileInputStream streamIn = new FileInputStream(in);
             objectinputstream = new ObjectInputStream(streamIn);
-            qTable = (Double[][]) objectinputstream.readObject();
+            qTable = (ArrayList<ArrayList<Double>>) objectinputstream.readObject();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -130,11 +126,12 @@ public class MyAgent implements Agent
         return qTable;
     }    
     
-    public void printTable(Double[][] t) {
-        for (int i = 0; i < t.length; i++) {
+    public void printTable(ArrayList<ArrayList<Double>> t) {
+        for (int i = 0; i < t.size(); i++) {
             System.out.print("row: " + i + "    ");
-            for (int j = 0; j < t[i].length; j++) {
-                System.out.print(t[i][j] + "  ");
+            for (int j = 0; j < t.get(i).size(); j++) {
+                System.out.print("index: " + j + " ");
+                System.out.print(t.get(i).get(j) + "  ");
             }
             System.out.print("\n");
         }

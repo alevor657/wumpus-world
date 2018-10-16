@@ -25,7 +25,7 @@ import java.util.Random;
 public class Q {
     private int actionSize;
     private int stateSize;
-    Double[][] qTable;
+    ArrayList<ArrayList<Double>> qTable;
     int epochs;
     double lerningRate;
     int maxSteps = 2000;
@@ -47,21 +47,22 @@ public class Q {
         this.lerningRate = learningRate;
         this.world = w;
         
-        this.qTable = new Double[this.stateSize][this.actionSize];
+        this.qTable = new ArrayList<ArrayList<Double>>();
         
-        for (int j = 0; j < this.qTable.length; j++) {
-            Arrays.fill(this.qTable[j], -100000.0);
+        for (int i = 0; i < stateSize; i++) {
+            this.qTable.add(new ArrayList());
+            this.qTable.set(i, new ArrayList(Collections.nCopies(this.actionSize, -100000.0)));
         }
         
-//        this.qTable[0][0] = 7.0;
-        
-        for (int i = 0; i < this.qTable.length; i++) {
+        for (int i = 0; i < this.qTable.size(); i++) {
             System.out.print("row: " + i + "    ");
-            for (int j = 0; j < this.qTable[i].length; j++) {
-                System.out.print(this.qTable[i][j] + "  ");
+            for (int j = 0; j < this.qTable.get(i).size(); j++) {
+                System.out.print(this.qTable.get(i).get(j) + "  ");
             }
             System.out.print("\n");
         }
+//        
+//        System.exit(0);
         
         this.rewards = new ArrayList<>();
     }
@@ -80,53 +81,53 @@ public class Q {
                 
                 
                 if (expTradeoff > this.epsilon) {
-//                    double actionValue = Collections.max(Arrays.asList(this.qTable[stateIndex]));
-//                    action = Arrays.asList(this.qTable[stateIndex]).indexOf(actionValue);
-                    
-                    int x, y, temp1;
-                    Double temp;
-                    boolean swaped;
+                    double actionValue = Collections.max(this.qTable.get(stateIndex));
+                    action = this.qTable.get(stateIndex).indexOf(actionValue);
 
-                    Double[] actions = this.qTable[stateIndex];
-                    int[] indexes = { 0, 1, 2, 3 };
+//                    int x, y, temp1;
+//                    Double temp;
+//                    boolean swaped;
+//
+//                    ArrayList<Double> actions = this.qTable.get(stateIndex);
+//                    int[] indexes = { 0, 1, 2, 3 };
                     
 //                     for (Double b : actions) {
 //                        System.out.print(b + "  ");
 //                    }
                      
-                    for (x = 0; x < actions.length - 1; x++) {
-                        swaped = false;
-
-                        for (y = 0; y < actions.length - x - 1; y++) {
-                            if (actions[y] < actions[y + 1]) {
-                                temp = actions[y];
-                                actions[y] = actions[y + 1];
-                                actions[y + 1] = temp;
-
-                                temp1 = indexes[y];
-                                indexes[y] = indexes[y + 1];
-                                indexes[y + 1] = temp1;
-                                swaped = true;
-                            }
-                        }
-
-                        if (!swaped) {
-                            break;
-                        }
-                    }
+//                    for (x = 0; x < actions.size() - 1; x++) {
+//                        swaped = false;
+//
+//                        for (y = 0; y < actions.size() - x - 1; y++) {
+//                            if (actions[y] < actions[y + 1]) {
+//                                temp = actions[y];
+//                                actions[y] = actions[y + 1];
+//                                actions[y + 1] = temp;
+//
+//                                temp1 = indexes[y];
+//                                indexes[y] = indexes[y + 1];
+//                                indexes[y + 1] = temp1;
+//                                swaped = true;
+//                            }
+//                        }
+//
+//                        if (!swaped) {
+//                            break;
+//                        }
+//                    }
                     
                    
                     
 //                    System.out.println("\n");
                     
-                    for (int z = 0; z < indexes.length; z++) {
+//                    for (int z = 0; z < indexes.length; z++) {
 //                        System.out.print(indexes[z]);
                         
-                        if (this.checkValidAction(z, world)) {
-                            action = z;
-                            break;
-                        }
-                    }
+//                        if (this.checkValidAction(z, world)) {
+//                            action = z;
+//                            break;
+//                        }
+//                    }
 //                    System.exit(1);
                 } else {
                     // Update new world
@@ -163,15 +164,15 @@ public class Q {
                 double reward = score2 - score1;
                 
                 int newStateIndex = (newWorld.getPlayerX() - 1) * 4 + newWorld.getPlayerY() - 1 ;
-                double prevValue = this.qTable[stateIndex][action];
-                double max = Collections.max(Arrays.asList(this.qTable[newStateIndex]));
+                double prevValue = this.qTable.get(stateIndex).get(action);
+                double max = Collections.max(this.qTable.get(newStateIndex));
                 
                 if (stateIndex == 0 && action == 0) {
                     System.out.println("FUCK!");
                     System.exit(0);
                 }
                 
-                this.qTable[stateIndex][action] = prevValue + this.lerningRate * (reward + this.gamma * max - prevValue);
+                this.qTable.get(stateIndex).set(action, prevValue + this.lerningRate * (reward + this.gamma * max - prevValue));
                 
                 world = newWorld;
                 
