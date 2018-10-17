@@ -51,7 +51,13 @@ public class MyAgent implements Agent
         ArrayList<ArrayList<Double>> qtable = this.qtable;
         
         int stateIndex = (this.w.getPlayerX() - 1) * 4 + this.w.getPlayerY() - 1;
-        double max = Collections.max(qtable.get(stateIndex));
+        double max = 0.0;
+        if(this.w.hasArrow()){
+            max = Collections.max(qtable.get(stateIndex));
+        }else{
+            max = Collections.max(qtable.get(stateIndex).subList(0, 4));
+        }
+        
         int action = qtable.get(stateIndex).indexOf(max);
         
         this.printTable(qtable);
@@ -83,17 +89,17 @@ public class MyAgent implements Agent
                 this.w.shootForward();
                 break;
             case 5:
-                System.out.println("SHOTING DOWN");
+                System.out.println("SHOTING RIGHT");
                 this.w.turnLeft();
                 this.w.shootForward();
                 break;
             case 6:
-                System.out.println("SHOTING DOWN");
+                System.out.println("SHOTING UP");
                 this.w.turnLeft();
                 this.w.shootForward();
                 break;
             case 7:
-                System.out.println("SHOTING DOWN");
+                System.out.println("SHOTING LEFT");
                 this.w.turnLeft();
                 this.w.shootForward();
                 break;
@@ -111,7 +117,7 @@ public class MyAgent implements Agent
     }
     
     private void train() {
-        Q q = new Q(16, 8, 100000, 0.001, this.w.cloneWorld());
+        Q q = new Q(16, 8, 100000, 0.01, this.w.cloneWorld());
         try {
             q.train();
         } catch (IOException ex) {
