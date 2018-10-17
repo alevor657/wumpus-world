@@ -175,7 +175,7 @@ public class Q {
                 
                 if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
                     newWorld.doAction(newWorld.A_GRAB);
-                    score1 -= 100000.0;
+                    score1 -= 1000.0;
                 }
 
                 if (newWorld.hasPit(newWorld.getPlayerX(), newWorld.getPlayerY())) {
@@ -186,7 +186,7 @@ public class Q {
                 double reward = score2 - score1;
                 
                 if (!newWorld.wumpusAlive() && !wumpusRewardTaken) {
-                    reward += 80000;
+                    reward += 1000;
                     wumpusRewardTaken = true;
                 }
                 
