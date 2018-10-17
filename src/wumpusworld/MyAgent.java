@@ -77,6 +77,26 @@ public class MyAgent implements Agent
                 this.w.turnLeft();
                 this.w.moveForward();
                 break;
+            case 4:
+                System.out.println("SHOTING DOWN");
+                this.w.turnDown();
+                this.w.shootForward();
+                break;
+            case 5:
+                System.out.println("SHOTING DOWN");
+                this.w.turnLeft();
+                this.w.shootForward();
+                break;
+            case 6:
+                System.out.println("SHOTING DOWN");
+                this.w.turnLeft();
+                this.w.shootForward();
+                break;
+            case 7:
+                System.out.println("SHOTING DOWN");
+                this.w.turnLeft();
+                this.w.shootForward();
+                break;
         }
         
         System.out.println(max);
@@ -91,7 +111,7 @@ public class MyAgent implements Agent
     }
     
     private void train() {
-        Q q = new Q(16, 4, 10000, 0.1, this.w.cloneWorld());
+        Q q = new Q(16, 8, 100000, 0.001, this.w.cloneWorld());
         try {
             q.train();
         } catch (IOException ex) {

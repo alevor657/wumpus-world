@@ -73,6 +73,7 @@ public class Q {
             System.out.println("epoch : " + i);    
             
             for (int k = 0; k < this.maxSteps; k++) {
+                boolean wumpusRewardTaken = false;
                 int stateIndex = (world.getPlayerX() - 1) * 4 + world.getPlayerY() - 1;
                 Random r = new Random();
                 double expTradeoff = r.nextDouble();
@@ -154,23 +155,44 @@ public class Q {
                         newWorld.turnLeft();
                         newWorld.moveForward();
                         break;
+                    case 4:
+                        newWorld.turnDown();
+                        newWorld.shootForward();
+                        break;
+                    case 5:
+                        newWorld.turnLeft();
+                        newWorld.shootForward();
+                        break;
+                    case 6:
+                        newWorld.turnLeft();
+                        newWorld.shootForward();
+                        break;
+                    case 7:
+                        newWorld.turnLeft();
+                        newWorld.shootForward();
+                        break;
                 }
                 
-//                if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
-//                    newWorld.doAction(newWorld.A_GRAB);
-//                }
+                if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
+                    newWorld.doAction(newWorld.A_GRAB);
+                    score1 -= 100000.0;
+                }
+
+                if (newWorld.hasPit(newWorld.getPlayerX(), newWorld.getPlayerY())) {
+                    newWorld.doAction(newWorld.A_CLIMB);
+                }
                 
                 int score2 = newWorld.getScore();
                 double reward = score2 - score1;
                 
+                if (!newWorld.wumpusAlive() && !wumpusRewardTaken) {
+                    reward += 80000;
+                    wumpusRewardTaken = true;
+                }
+                
                 int newStateIndex = (newWorld.getPlayerX() - 1) * 4 + newWorld.getPlayerY() - 1 ;
                 double prevValue = this.qTable.get(stateIndex).get(action);
                 double max = Collections.max(this.qTable.get(newStateIndex));
-                
-                if (stateIndex == 0 && action == 0) {
-                    System.out.println("FUCK!");
-                    System.exit(0);
-                }
                 
                 this.qTable.get(stateIndex).set(action, prevValue + this.lerningRate * (reward + this.gamma * max - prevValue));
                 
@@ -232,10 +254,22 @@ public class Q {
         Random r = new Random();
         
         while (true) {
-            int randomAction = r.nextInt(4);
+            int randomAction;
             
-            if (this.checkValidAction(randomAction, w)) {
-                return randomAction;
+            if (w.hasArrow()) {
+                randomAction = r.nextInt(8);
+            } else {
+                randomAction = r.nextInt(4);
+            }
+            
+            if (randomAction < 4) {
+                if (this.checkValidAction(randomAction, w)) {
+                    return randomAction;
+                }
+            } else {
+                if (this.checkValidAction(randomAction - 4, w)) {
+                    return randomAction;
+                }
             }
         }
     }
