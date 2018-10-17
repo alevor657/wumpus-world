@@ -117,7 +117,7 @@ public class MyAgent implements Agent
     }
     
     private void train() {
-        Q q = new Q(16, 8, 100000, 0.01, this.w.cloneWorld());
+        Q q = new Q(16, 8, 10000, 0.01, this.w.cloneWorld());
         try {
             q.train();
         } catch (IOException ex) {
@@ -131,9 +131,11 @@ public class MyAgent implements Agent
         
         ArrayList<ArrayList<Double>> qTable = null;
         
+        int mapNr = Integer.parseInt(GUI.getSelectedLevel());
+        
         try {
             String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "QTables";
-            File in = new File(path, "qtable1.ser");
+            File in = new File(path, "qtable" + mapNr + ".ser");
             FileInputStream streamIn = new FileInputStream(in);
             objectinputstream = new ObjectInputStream(streamIn);
             qTable = (ArrayList<ArrayList<Double>>) objectinputstream.readObject();

@@ -21,7 +21,7 @@ public class GUI implements ActionListener
     private World w;
     private Agent agent;
     private JPanel[][] blocks;
-    private JComboBox mapList;
+    private static JComboBox mapList;
     private Vector<WorldMap> maps;
     
     private ImageIcon l_breeze;
@@ -333,4 +333,9 @@ public class GUI implements ActionListener
         gamepanel.updateUI();
         gamepanel.repaint();
     }  
+    
+    
+    public static String getSelectedLevel() {
+        return (String)mapList.getSelectedItem();
+    }
 }

@@ -213,10 +213,19 @@ public class Q {
         ObjectOutputStream oos = null;
         FileOutputStream fout = null;
         
+        int mapNr = Integer.parseInt(GUI.getSelectedLevel());
+
+        System.out.println("Writing msp nr " + mapNr);
+                        
         try {
             String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "QTables";
             new File(path).mkdir();
-            File file = new File(path + System.getProperty("file.separator"), "qtable1.ser");
+            File file = new File(path + System.getProperty("file.separator"), "qtable" + mapNr + ".ser");
+            
+            if (file.exists()) {
+                file.delete();
+            }
+            
             fout = new FileOutputStream(file, true);
             oos = new ObjectOutputStream(fout);
             oos.writeObject(this.qTable);
