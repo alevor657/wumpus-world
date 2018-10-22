@@ -2,6 +2,13 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/D:/OneDrive%20-%20Blekinge%20Tekniska%20Högskola%20(student%20domain)/AI/wumpus-world/src/wumpusworld/GUI.java</file>
+            <file>file:/D:/OneDrive%20-%20Blekinge%20Tekniska%20Högskola%20(student%20domain)/AI/wumpus-world/src/wumpusworld/World.java</file>
+            <file>file:/D:/OneDrive%20-%20Blekinge%20Tekniska%20Högskola%20(student%20domain)/AI/wumpus-world/src/wumpusworld/Q.java</file>
+            <file>file:/D:/OneDrive%20-%20Blekinge%20Tekniska%20Högskola%20(student%20domain)/AI/wumpus-world/src/wumpusworld/WumpusWorld.java</file>
+            <file>file:/D:/OneDrive%20-%20Blekinge%20Tekniska%20Högskola%20(student%20domain)/AI/wumpus-world/src/wumpusworld/MyAgent.java</file>
+            <file>file:/D:/OneDrive%20-%20Blekinge%20Tekniska%20Högskola%20(student%20domain)/AI/wumpus-world/src/wumpusworld/WorldMap.java</file>
+        </group>
     </open-files>
 </project-private>

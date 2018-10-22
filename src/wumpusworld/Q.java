@@ -36,7 +36,7 @@ public class Q {
     double epsilon = 1.0;
     double maxEpsilon = 1;
     double minEpsilon = 0.01;
-    double decayRate = 0.005;
+    double decayRate = 0.05;
     
     ArrayList<Integer> rewards;
     
@@ -51,7 +51,7 @@ public class Q {
         
         for (int i = 0; i < stateSize; i++) {
             this.qTable.add(new ArrayList());
-            this.qTable.set(i, new ArrayList(Collections.nCopies(this.actionSize, -100000.0)));
+            this.qTable.set(i, new ArrayList(Collections.nCopies(this.actionSize, 0.0)));
         }
         
         for (int i = 0; i < this.qTable.size(); i++) {
@@ -67,6 +67,26 @@ public class Q {
         this.rewards = new ArrayList<>();
     }
     
+    public static int getStateIndex(World w) {
+        int magic;
+        int x = w.getPlayerX();
+        int y = w.getPlayerY();
+        boolean stench = w.hasStench(x, y);
+        boolean breeze = w.hasBreeze(x, y);
+        
+        if (breeze && stench) {
+            magic = 0;
+        } else if (stench) {
+            magic = 1;
+        } else if (breeze) {
+            magic = 2;
+        } else {
+            magic = 3;
+        }
+        
+        return 4 * (4 * (x - 1) + (y - 1)) + magic;
+    }
+    
     public void train() throws IOException {
         for (int i = 0; i < this.epochs; i++) {
             World world = this.world.cloneWorld();
@@ -74,7 +94,7 @@ public class Q {
             
             for (int k = 0; k < this.maxSteps; k++) {
                 boolean wumpusRewardTaken = false;
-                int stateIndex = (world.getPlayerX() - 1) * 4 + world.getPlayerY() - 1;
+                int stateIndex = this.getStateIndex(world);
                 Random r = new Random();
                 double expTradeoff = r.nextDouble();
                 
@@ -84,52 +104,6 @@ public class Q {
                 if (expTradeoff > this.epsilon) {
                     double actionValue = Collections.max(this.qTable.get(stateIndex));
                     action = this.qTable.get(stateIndex).indexOf(actionValue);
-
-//                    int x, y, temp1;
-//                    Double temp;
-//                    boolean swaped;
-//
-//                    ArrayList<Double> actions = this.qTable.get(stateIndex);
-//                    int[] indexes = { 0, 1, 2, 3 };
-                    
-//                     for (Double b : actions) {
-//                        System.out.print(b + "  ");
-//                    }
-                     
-//                    for (x = 0; x < actions.size() - 1; x++) {
-//                        swaped = false;
-//
-//                        for (y = 0; y < actions.size() - x - 1; y++) {
-//                            if (actions[y] < actions[y + 1]) {
-//                                temp = actions[y];
-//                                actions[y] = actions[y + 1];
-//                                actions[y + 1] = temp;
-//
-//                                temp1 = indexes[y];
-//                                indexes[y] = indexes[y + 1];
-//                                indexes[y + 1] = temp1;
-//                                swaped = true;
-//                            }
-//                        }
-//
-//                        if (!swaped) {
-//                            break;
-//                        }
-//                    }
-                    
-                   
-                    
-//                    System.out.println("\n");
-                    
-//                    for (int z = 0; z < indexes.length; z++) {
-//                        System.out.print(indexes[z]);
-                        
-//                        if (this.checkValidAction(z, world)) {
-//                            action = z;
-//                            break;
-//                        }
-//                    }
-//                    System.exit(1);
                 } else {
                     // Update new world
                     action = this.getValidRandomMove(world);
@@ -160,22 +134,20 @@ public class Q {
                         newWorld.shootForward();
                         break;
                     case 5:
-                        newWorld.turnLeft();
+                        newWorld.turnRight();
                         newWorld.shootForward();
                         break;
                     case 6:
-                        newWorld.turnLeft();
+                        newWorld.turnUp();
                         newWorld.shootForward();
                         break;
                     case 7:
                         newWorld.turnLeft();
                         newWorld.shootForward();
                         break;
-                }
-                
-                if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
-                    newWorld.doAction(newWorld.A_GRAB);
-                    score1 -= 1000.0;
+                    default:
+                        System.out.println("action != 1 - 7");
+                        System.exit(1);
                 }
 
                 if (newWorld.hasPit(newWorld.getPlayerX(), newWorld.getPlayerY())) {
@@ -190,7 +162,12 @@ public class Q {
                     wumpusRewardTaken = true;
                 }
                 
-                int newStateIndex = (newWorld.getPlayerX() - 1) * 4 + newWorld.getPlayerY() - 1 ;
+                if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
+                    newWorld.doAction(newWorld.A_GRAB);
+                    reward += 1000;
+                }
+                
+                int newStateIndex = this.getStateIndex(newWorld);
                 double prevValue = this.qTable.get(stateIndex).get(action);
                 double max = Collections.max(this.qTable.get(newStateIndex));
                 
@@ -213,15 +190,16 @@ public class Q {
         ObjectOutputStream oos = null;
         FileOutputStream fout = null;
         
-        int mapNr = Integer.parseInt(GUI.getSelectedLevel());
+//        int mapNr = Integer.parseInt(GUI.getSelectedLevel());
 
-        System.out.println("Writing msp nr " + mapNr);
+//        System.out.println("Writing msp nr " + mapNr);
                         
         try {
             String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "QTables";
             new File(path).mkdir();
-            File file = new File(path + System.getProperty("file.separator"), "qtable" + mapNr + ".ser");
-            
+//            File file = new File(path + System.getProperty("file.separator"), "qtable" + mapNr + ".ser");
+            File file = new File(path + System.getProperty("file.separator"), "qtable.ser");
+
             if (file.exists()) {
                 file.delete();
             }

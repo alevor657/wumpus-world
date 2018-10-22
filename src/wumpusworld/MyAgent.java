@@ -50,9 +50,10 @@ public class MyAgent implements Agent
     public void doTurn() {
         ArrayList<ArrayList<Double>> qtable = this.qtable;
         
-        int stateIndex = (this.w.getPlayerX() - 1) * 4 + this.w.getPlayerY() - 1;
+        int stateIndex = Q.getStateIndex(this.w);
         double max = 0.0;
-        if(this.w.hasArrow()){
+        
+        if (this.w.hasArrow()){
             max = Collections.max(qtable.get(stateIndex));
         }else{
             max = Collections.max(qtable.get(stateIndex).subList(0, 4));
@@ -90,12 +91,12 @@ public class MyAgent implements Agent
                 break;
             case 5:
                 System.out.println("SHOTING RIGHT");
-                this.w.turnLeft();
+                this.w.turnRight();
                 this.w.shootForward();
                 break;
             case 6:
                 System.out.println("SHOTING UP");
-                this.w.turnLeft();
+                this.w.turnUp();
                 this.w.shootForward();
                 break;
             case 7:
@@ -117,7 +118,7 @@ public class MyAgent implements Agent
     }
     
     private void train() {
-        Q q = new Q(16, 8, 10000, 0.01, this.w.cloneWorld());
+        Q q = new Q(64, 8, 150000, 0.01, this.w.cloneWorld());
         try {
             q.train();
         } catch (IOException ex) {
@@ -131,11 +132,12 @@ public class MyAgent implements Agent
         
         ArrayList<ArrayList<Double>> qTable = null;
         
-        int mapNr = Integer.parseInt(GUI.getSelectedLevel());
+//        int mapNr = Integer.parseInt(GUI.getSelectedLevel());
         
         try {
             String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "QTables";
-            File in = new File(path, "qtable" + mapNr + ".ser");
+//            File in = new File(path, "qtable" + mapNr + ".ser");
+            File in = new File(path, "qtable.ser");
             FileInputStream streamIn = new FileInputStream(in);
             objectinputstream = new ObjectInputStream(streamIn);
             qTable = (ArrayList<ArrayList<Double>>) objectinputstream.readObject();
