@@ -40,15 +40,32 @@ public class Q {
     
     ArrayList<Integer> rewards;
     
-    public Q(int stateSize, int actionSize, int epochs, double learningRate, World w) {
+    public Q(int stateSize, int actionSize, int epochs, double learningRate, World w) throws InterruptedException {
         this.actionSize = actionSize;
         this.stateSize = stateSize;
         this.epochs = epochs;
         this.lerningRate = learningRate;
         this.world = w;
         
-        this.qTable = new ArrayList<ArrayList<Double>>();
+        this.qTable = new ArrayList<ArrayList<Double>>();        
+        this.rewards = new ArrayList<>();
         
+        
+        String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "QTables";
+        File file = new File(path + System.getProperty("file.separator"), "qtable.ser");
+
+        if (file.exists()) {
+            System.out.println("Reading existing table");
+            Thread.sleep(1000);
+            this.qTable = MyAgent.readTable();
+        } else {
+            System.out.println("Creating new qTable");
+            Thread.sleep(1000);
+            initTable();
+        }
+    }
+    
+    private void initTable() {
         for (int i = 0; i < stateSize; i++) {
             this.qTable.add(new ArrayList());
             this.qTable.set(i, new ArrayList(Collections.nCopies(this.actionSize, 0.0)));
@@ -61,10 +78,6 @@ public class Q {
             }
             System.out.print("\n");
         }
-//        
-//        System.exit(0);
-        
-        this.rewards = new ArrayList<>();
     }
     
     public static int getStateIndex(World w) {
@@ -164,7 +177,7 @@ public class Q {
                 
                 if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
                     newWorld.doAction(newWorld.A_GRAB);
-                    reward += 1000;
+                    reward += 10000;
                 }
                 
                 int newStateIndex = this.getStateIndex(newWorld);

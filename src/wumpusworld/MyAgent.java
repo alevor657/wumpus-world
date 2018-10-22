@@ -38,13 +38,17 @@ public class MyAgent implements Agent
      */
     public void doAction()
     {
-//        this.train();
-        
         if (this.qtable == null) {
-            this.qtable = this.readTable();
+            this.qtable =qtable = MyAgent.readTable();
         }
-        
+
         this.doTurn();
+        
+//        try {
+//            this.train();
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(MyAgent.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
     
     public void doTurn() {
@@ -117,8 +121,8 @@ public class MyAgent implements Agent
         }
     }
     
-    private void train() {
-        Q q = new Q(64, 8, 150000, 0.01, this.w.cloneWorld());
+    private void train() throws InterruptedException {
+        Q q = new Q(64, 8, 60000, 0.01, this.w.cloneWorld());
         try {
             q.train();
         } catch (IOException ex) {
@@ -127,7 +131,7 @@ public class MyAgent implements Agent
         System.out.println("Trained!");
     }
     
-    private ArrayList<ArrayList<Double>> readTable() {
+    public static ArrayList<ArrayList<Double>> readTable() {
         ObjectInputStream objectinputstream = null;
         
         ArrayList<ArrayList<Double>> qTable = null;
