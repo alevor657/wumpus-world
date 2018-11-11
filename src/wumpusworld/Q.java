@@ -153,30 +153,38 @@ public class Q {
             up = getMagicValue(w, x, y);
             left = getMagicValue(w, x-1, y-1);
             tile = getTileValue(w, x, y-1);
+            
+            return 2*(6*(6*(6*(left) + right) + down) + up) + tile;
         }else if(direction == w.DIR_RIGHT){
             down = getMagicValue(w, x+1, y-1);
             right = getMagicValue(w, x+2, y);
             up = getMagicValue(w, x+1, y+1);
             left = getMagicValue(w, x, y);
             tile = getTileValue(w, x+1, y);
+            
+            return 2*(6*(6*(6*(up) + down) + right) + left) + tile;
         }else if(direction == w.DIR_UP){
             down = getMagicValue(w, x, y);
             right = getMagicValue(w, x+1, y+1);
             up = getMagicValue(w, x, y+2);
             left = getMagicValue(w, x-1, y+1);
             tile = getTileValue(w, x, y+1);
+            
+            return 2*(6*(6*(6*(right) + left) + up) + down) + tile;
         }else if(direction == w.DIR_LEFT){
             down = getMagicValue(w, x-1, y-1);
             right = getMagicValue(w, x, y);
             up = getMagicValue(w, x-1, y+1);
             left = getMagicValue(w, x-2, y);
             tile = getTileValue(w, x-1, y);
+            
+            return 2*(6*(6*(6*(down) + up) + left) + right) + tile;
         }
-        int[] arr = {down, right, up, left};
-        
+//        int[] arr = {down, right, up, left};
+        return -1;
 //        Arrays.sort(arr);
         
-        return 2*(6*(6*(6*(arr[3]) + arr[2]) + arr[1]) + arr[0]) + tile;
+//        return 2*(6*(6*(6*(arr[3]) + arr[2]) + arr[1]) + arr[0]) + tile;
     }
     
     public void train() throws IOException {
@@ -335,7 +343,7 @@ public class Q {
 
                 if (newWorld.hasPit(newWorld.getPlayerX(), newWorld.getPlayerY())) {
                     newWorld.doAction(newWorld.A_CLIMB);
-                    score1 += 500;
+//                    score1 += 500;
                 }
                 
                 
@@ -343,13 +351,13 @@ public class Q {
                 double reward = score2 - score1;
                 
                 if (!newWorld.wumpusAlive() && !wumpusRewardTaken) {
-                    reward += 800;
+                    reward += 1000;
                     wumpusRewardTaken = true;
                 }
                 
                 if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
                     newWorld.doAction(newWorld.A_GRAB);
-//                    reward += 600;
+                    reward += 1000;
                 }
                 if(exploreReward1 && exploreReward2){
                     reward += 200;
