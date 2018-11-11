@@ -48,17 +48,17 @@ public class MyAgent implements Agent
      */
     public void doAction()
     {
-        if (this.qtable == null) {
-            this.qtable = MyAgent.readTable();
-        }
-
-        this.doTurn();
-        
-//        try {
-//            this.train();
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(MyAgent.class.getName()).log(Level.SEVERE, null, ex);
+//        if (this.qtable == null) {
+//            this.qtable = MyAgent.readTable();
 //        }
+//
+//        this.doTurn();
+        
+        try {
+            this.train();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MyAgent.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void doTurn() {
@@ -147,29 +147,29 @@ public class MyAgent implements Agent
             System.out.println(direction);
             int action = qtable.get(stateIndex).indexOf(maxy);
             
-//            if(loop1 && loop2){
-////                action = qtable.get(prevMaxState).indexOf(prevMax);
-////                direction = Arrays.asList(ds).indexOf(prevMax);
-//                maxys_dup = maxys;
-//                
-//                Collections.sort(maxys);
-//                Collections.reverse(maxys);
-//                System.out.println("maxys:"+maxys);
-//                System.out.println("maxys_dup:"+maxys_dup);
-//                direction = ds.get(maxys_dup.indexOf(maxys.get(1)));              
-//           
-//                int si = stateIndices.get(maxys_dup.indexOf(maxys.get(1)));
-//                
-//                System.out.println(qtable.get(si));
-//                System.out.println(maxys.get(1));
-//
-//                action = qtable.get(si).indexOf(maxys.get(1));
-//                loop1=false;
-//                loop2=false;
-//                System.out.println("looped");
-//                System.out.println("direction:"+direction);
-//                System.out.println("action:"+action);
-//            }
+            if(loop1 && loop2){
+//                action = qtable.get(prevMaxState).indexOf(prevMax);
+//                direction = Arrays.asList(ds).indexOf(prevMax);
+                maxys_dup = maxys;
+                
+                Collections.sort(maxys);
+                Collections.reverse(maxys);
+                System.out.println("maxys:"+maxys);
+                System.out.println("maxys_dup:"+maxys_dup);
+                direction = ds.get(maxys_dup.indexOf(maxys.get(1)));              
+           
+                int si = stateIndices.get(maxys_dup.indexOf(maxys.get(1)));
+                
+                System.out.println(qtable.get(si));
+                System.out.println(maxys.get(1));
+
+                action = qtable.get(si).indexOf(maxys.get(1));
+                loop1=false;
+                loop2=false;
+                System.out.println("looped");
+                System.out.println("direction:"+direction);
+                System.out.println("action:"+action);
+            }
             if(!this.w.hasStench(x, y)){
                 action=0;
             }
@@ -222,7 +222,7 @@ public class MyAgent implements Agent
     }
     
     private void train() throws InterruptedException {
-    Q q = new Q(20000, 2, 20000, 0.001, this.w.cloneWorld());
+    Q q = new Q(20000, 2, 100000, 0.001, this.w.cloneWorld());
         try {
             q.train();
         } catch (IOException ex) {

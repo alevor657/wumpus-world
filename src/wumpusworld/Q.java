@@ -37,7 +37,7 @@ public class Q {
     double epsilon = 1.0;
     double maxEpsilon = 1;
     double minEpsilon = 0.01;
-    double decayRate = 0.000005;
+    double decayRate = 0.00005;
     
     ArrayList<Integer> rewards;
     
@@ -343,7 +343,7 @@ public class Q {
 
                 if (newWorld.hasPit(newWorld.getPlayerX(), newWorld.getPlayerY())) {
                     newWorld.doAction(newWorld.A_CLIMB);
-//                    score1 += 500;
+//                    score1 += 1000;
                 }
                 
                 
@@ -351,16 +351,13 @@ public class Q {
                 double reward = score2 - score1;
                 
                 if (!newWorld.wumpusAlive() && !wumpusRewardTaken) {
-                    reward += 1000;
+                    reward += 25;
                     wumpusRewardTaken = true;
                 }
                 
-                if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
-                    newWorld.doAction(newWorld.A_GRAB);
-                    reward += 1000;
-                }
+                
                 if(exploreReward1 && exploreReward2){
-                    reward += 200;
+                    reward += 7;
                 }
                 exploreReward1 = false;
                 exploreReward2 = false;
@@ -372,7 +369,7 @@ public class Q {
                 for (int direct: directs1){
                     // if valid 
                     tempStateIndex = this.getStateIndex(newWorld, x, y, direct);
-                    maxVal = Collections.max(this.qTable.get(stateIndex));
+                    maxVal = this.qTable.get(stateIndex).get(0);
                     if(maxVal > maxy1){
                         newStateIndex = tempStateIndex;
                         maxy1 = maxVal;
@@ -382,7 +379,10 @@ public class Q {
 //                double max = Collections.max(this.qTable.get(newStateIndex));
                 
                 this.qTable.get(stateIndex).set(action, prevValue + this.lerningRate * (reward + this.gamma * maxy1 - prevValue));
-                
+                if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
+                    newWorld.doAction(newWorld.A_GRAB);
+//                    reward += 1000;
+                }
                 world = newWorld;
                 
                 if (newWorld.gameOver()) {
