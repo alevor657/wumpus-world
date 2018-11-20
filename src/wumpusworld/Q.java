@@ -178,7 +178,7 @@ public class Q {
                 int action = -10;
                 int direction = -1;
                 double maxVal = 0.0;
-                double maxy = -100000.0;
+                double maxy = Double.NEGATIVE_INFINITY;
                 int tempStateIndex;
                 
                 if (expTradeoff > this.epsilon) {
