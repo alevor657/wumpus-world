@@ -159,34 +159,14 @@ public class Q {
     public void train() throws IOException {
         for (int i = 0; i < this.epochs; i++) {
             World world = this.world.cloneWorld();
-            int[] looper = new int[3];
-            Arrays.fill(looper, -1);
-//            int grandma= -1;
-//            int mom = -2;
-//            int child = -3;
+
             System.out.println("epoch : " + i);    
-            boolean loop1=false;
-            boolean loop2=false;
+
             
             for (int k = 0; k < this.maxSteps; k++) {
                 boolean wumpusRewardTaken = false;
                 int x = world.getPlayerX();
-                int y = world.getPlayerY();
-                
-//                grandma = mom;
-//                mom = child;
-//                child = 4*(x-1) + y;
-
-//                if(loop1){
-//                    if(grandma == child){
-//                        loop2 = true;
-//                    }
-//                }
-//
-//                if(grandma == child){
-//                    loop1 = true;
-////                    System.out.println("looping");
-//                }
+                int y = world.getPlayerY();             
                 
                 int stateIndex = this.getStateIndex(world, x, y, world.getDirection());
                 Random r = new Random();
@@ -202,51 +182,33 @@ public class Q {
                 int tempStateIndex;
                 
                 if (expTradeoff > this.epsilon) {
-                    if(loop1 && loop2){
-                        direction = this.returnValidDirection(world);
-                        action = this.getValidRandomAction(world);
-//                        System.out.println("Taking random step");
-                        loop1=false;
-                        loop2=false;
-                        
-                    } else {
-    //                    double actionValue = Collections.max(this.qTable.get(stateIndex));
-    //                    action = this.qTable.get(stateIndex).indexOf(actionValue);
-                        int bestDirection = -1;
-                        int[] directs = {0,1,2,3};
-                        for (int direct: directs){
-                            if(direct==0 && !world.isValidPosition(x, y+1)){
-                                continue;
-                            }else if(direct==1 && !world.isValidPosition(x+1, y)){
-                                continue;
-                            }
-                            else if(direct==2 && !world.isValidPosition(x, y-1)){
-                                continue;
-                            }
-                            else if(direct==3 && !world.isValidPosition(x-1, y)){
-                                continue;
-                            }
-                            tempStateIndex = this.getStateIndex(world, x, y, direct);
-                            maxVal = Collections.max(this.qTable.get(tempStateIndex));
-
-                            if(maxVal > maxy){
-                                stateIndex = tempStateIndex;
-                                maxy = maxVal;
-                                bestDirection = direct;
-                            }
+                    int bestDirection = -1;
+                    int[] directs = {0, 1, 2, 3};
+                    for (int direct : directs) {
+                        if (direct == 0 && !world.isValidPosition(x, y + 1)) {
+                            continue;
+                        } else if (direct == 1 && !world.isValidPosition(x + 1, y)) {
+                            continue;
+                        } else if (direct == 2 && !world.isValidPosition(x, y - 1)) {
+                            continue;
+                        } else if (direct == 3 && !world.isValidPosition(x - 1, y)) {
+                            continue;
                         }
-                        direction = bestDirection;
-                        action = this.qTable.get(stateIndex).indexOf(maxy);
+                        tempStateIndex = this.getStateIndex(world, x, y, direct);
+                        maxVal = Collections.max(this.qTable.get(tempStateIndex));
+
+                        if (maxVal > maxy) {
+                            stateIndex = tempStateIndex;
+                            maxy = maxVal;
+                            bestDirection = direct;
+                        }
                     }
-                } else {
-//                    System.out.println("Exploring");
-                    direction = this.returnValidDirection(world);
-//                    if(world.hasStench(x, y)){
-                        action = this.getValidRandomAction(world);
-//                    }else{
-//                        action = 0;
-//                    }
+                    direction = bestDirection;
+                    action = this.qTable.get(stateIndex).indexOf(maxy);
                     
+                } else {
+                    direction = this.returnValidDirection(world);
+                    action = this.getValidRandomAction(world);    
                 }
                 
                 World newWorld = world.cloneWorld();

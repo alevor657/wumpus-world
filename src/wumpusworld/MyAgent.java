@@ -72,35 +72,15 @@ public class MyAgent implements Agent
             int y = this.w.getPlayerY();
             int stateIndex = Q.getStateIndex(this.w, x, y, this.w.getDirection());
             double max = 0.0;
-            
-//            grandma = mom;
-//            mom = child;
-//            child = 4*(x-1) + y;
-//            
-//            if(loop1){
-//                if(grandma == child){
-//                    loop2 = true;
-//                }
-//            }
-//
-//            if(grandma == child){
-//                loop1 = true;
-//            }
-            
-            
-
-//            System.out.println("loop:"+grandma+","+mom+","+child);
-//            System.out.println("loop1:"+loop1);
-//            System.out.println("loop2:"+loop2);
-            
+                        
             int bestDirection = -1;
             int prevDirection = -1;
             int[] directs = {0, 1, 2, 3};
             int tempStateIndex = -1;
             int prevMaxState = -1;
             double prevMax = 0.0;
-            double maxVal=-1000000.0;
-            double maxy = -1000000.0;
+            double maxVal= Double.NEGATIVE_INFINITY;
+            double maxy = Double.NEGATIVE_INFINITY;
             
 //            double[] ds = {-2,-2,-2,-2};
             List<Double> maxys = new ArrayList<>();
@@ -128,52 +108,21 @@ public class MyAgent implements Agent
                 maxys.add(maxVal);
                 stateIndices.add(tempStateIndex);
                 ds.add(direct);
-//                ds[direct] = maxVal;
                 System.out.println("Direction:"+direct+":"+qtable.get(tempStateIndex));
                 if (maxVal > maxy) {
                     prevMaxState = stateIndex;
-//                    prevDirection = bestDirection;
-//                    prevMax = maxy;
                     stateIndex = tempStateIndex;
                     maxy = maxVal;
                     bestDirection = direct;
-//                    if(prevDirection==-1){
-//                        prevDirection = bestDirection;
-//                    }
                 }
             }
             int direction = bestDirection;
             int action = qtable.get(stateIndex).indexOf(maxy);
             
-//            if(loop1 && loop2){
-////                action = qtable.get(prevMaxState).indexOf(prevMax);
-////                direction = Arrays.asList(ds).indexOf(prevMax);
-//                maxys_dup = maxys;
-//                
-//                Collections.sort(maxys);
-//                Collections.reverse(maxys);
-//                System.out.println("maxys:"+maxys);
-//                System.out.println("maxys_dup:"+maxys_dup);
-//                direction = ds.get(maxys_dup.indexOf(maxys.get(1)));              
-//           
-//                int si = stateIndices.get(maxys_dup.indexOf(maxys.get(1)));
-//                
-//                System.out.println(qtable.get(si));
-//                System.out.println(maxys.get(1));
-//
-//                action = qtable.get(si).indexOf(maxys.get(1));
-//                loop1=false;
-//                loop2=false;
-//                System.out.println("looped");
-//                System.out.println("direction:"+direction);
-//                System.out.println("action:"+action);
-//            }
             if(!this.w.hasStench(x, y)){
                 action=0;
             }
-    //        int action = qtable.get(stateIndex).indexOf(max);
-
-    //        this.printTable(qtable);
+    
             System.out.println("State index: " + qtable.get(stateIndex));
 
             switch (direction) {
