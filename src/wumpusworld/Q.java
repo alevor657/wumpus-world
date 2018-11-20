@@ -37,7 +37,7 @@ public class Q {
     double epsilon = 1.0;
     double maxEpsilon = 1;
     double minEpsilon = 0.01;
-    double decayRate = 0.05;
+    double decayRate = 0.9;
     
     ArrayList<Integer> rewards;
     
@@ -74,7 +74,6 @@ public class Q {
     }
     
     public static int getTileValue(World w, int x, int y){
-
         if(!w.isVisited(x, y)){
             return 0;
         }else{
@@ -161,7 +160,6 @@ public class Q {
             World world = this.world.cloneWorld();
 
             System.out.println("epoch : " + i);    
-
             
             for (int k = 0; k < this.maxSteps; k++) {
                 boolean wumpusRewardTaken = false;
@@ -282,26 +280,23 @@ public class Q {
                 
                 
                 if(exploreReward1 && exploreReward2){
-                    reward += 7;
+                    reward += 12;
                 }
+                
                 exploreReward1 = false;
                 exploreReward2 = false;
                 
-                int newStateIndex=-1;
                 double prevValue = this.qTable.get(stateIndex).get(action);
                 double maxy1 = Double.NEGATIVE_INFINITY;
                 int[] directs1 = {0,1,2,3};
                 for (int direct: directs1){
                     // if valid 
                     tempStateIndex = this.getStateIndex(newWorld, x, y, direct);
-                    maxVal = this.qTable.get(stateIndex).get(0);
+                    maxVal = this.qTable.get(tempStateIndex).get(0);
                     if(maxVal > maxy1){
-                        newStateIndex = tempStateIndex;
                         maxy1 = maxVal;
-                        
                     }
                 }
-//                double max = Collections.max(this.qTable.get(newStateIndex));
                 
                 this.qTable.get(stateIndex).set(action, prevValue + this.lerningRate * (reward + this.gamma * maxy1 - prevValue));
                 
