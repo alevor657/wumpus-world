@@ -40,23 +40,23 @@ public class MyAgent implements Agent
      */
     public void doAction()
     {
-        if (this.qtable == null) {
-            this.qtable = MyAgent.readTable();
-        }
-
-        this.doTurn();
-        
-//        try {
-//            this.train();
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(MyAgent.class.getName()).log(Level.SEVERE, null, ex);
+//        if (this.qtable == null) {
+//            this.qtable = MyAgent.readTable();
 //        }
+//
+//        this.doTurn();
+        
+        try {
+            this.train();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MyAgent.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void doTurn() {
         if (this.w.hasGlitter(this.w.getPlayerX(), this.w.getPlayerY())) {
             this.w.doAction(this.w.A_GRAB);
-        }else{
+        } else {
             if (this.w.hasPit(this.w.getPlayerX(), this.w.getPlayerY())) {
                 this.w.doAction(this.w.A_CLIMB);
             }
@@ -64,46 +64,39 @@ public class MyAgent implements Agent
             int x = this.w.getPlayerX();
             int y = this.w.getPlayerY();
             int stateIndex = Q.getStateIndex(this.w, x, y, this.w.getDirection());
-            double max = 0.0;
                         
             int bestDirection = -1;
-            int prevDirection = -1;
             int[] directs = {0, 1, 2, 3};
             int tempStateIndex = -1;
-            int prevMaxState = -1;
-            double prevMax = 0.0;
             double maxVal= Double.NEGATIVE_INFINITY;
             double maxy = Double.NEGATIVE_INFINITY;
             
-//            double[] ds = {-2,-2,-2,-2};
-            List<Double> maxys = new ArrayList<>();
-            List<Double> maxys_dup = new ArrayList<>();
-            List<Integer> stateIndices = new ArrayList<>();
-            List<Integer> ds = new ArrayList<>();
             for (int direct : directs) {
                 if(direct==0 && !this.w.isValidPosition(x, y+1)){
                     continue;
-                }else if(direct==1 && !this.w.isValidPosition(x+1, y)){
+                } else if (direct==1 && !this.w.isValidPosition(x+1, y)){
                     continue;
-                }
-                else if(direct==2 && !this.w.isValidPosition(x, y-1)){
+                } else if (direct==2 && !this.w.isValidPosition(x, y-1)){
                     continue;
-                }
-                else if(direct==3 && !this.w.isValidPosition(x-1, y)){
+                } else if (direct==3 && !this.w.isValidPosition(x-1, y)){
                     continue;
+                } else {
+                    System.out.println("SOME FUCKING SHIT HAPPEND");
+                    System.exit(1);
                 }
+                
                 tempStateIndex = Q.getStateIndex(this.w, x, y, direct);
-                if(!this.w.hasStench(x, y)){
-                    maxVal = qtable.get(tempStateIndex).get(0);
-                }else{
-                    maxVal = Collections.max(qtable.get(tempStateIndex)); 
-                }
-                maxys.add(maxVal);
-                stateIndices.add(tempStateIndex);
-                ds.add(direct);
+                
+//                if (!this.w.hasStench(x, y)){
+//                    maxVal = qtable.get(tempStateIndex).get(0);
+//                } else {
+//                    maxVal = Collections.max(qtable.get(tempStateIndex)); 
+//                }
+
+                maxVal = Collections.max(qtable.get(tempStateIndex));
                 System.out.println("Direction:"+direct+":"+qtable.get(tempStateIndex));
+                
                 if (maxVal > maxy) {
-                    prevMaxState = stateIndex;
                     stateIndex = tempStateIndex;
                     maxy = maxVal;
                     bestDirection = direct;
@@ -122,36 +115,32 @@ public class MyAgent implements Agent
                 case 0:
                     System.out.println("GOING up");
                     this.w.turnUp();
-    //                this.w.moveForward();
                     break;
                 case 1:
                     System.out.println("GOING RIGHT");
                     this.w.turnRight();
-    //                this.w.moveForward();
                     break;
                 case 2:
                     System.out.println("GOING down");
                     this.w.turnDown();
-    //                this.w.moveForward();
                     break;
                 case 3:
                     System.out.println("GOING Left");
                     this.w.turnLeft();
-    //                this.w.moveForward();
                     break;
             }
-            if(!this.w.hasArrow()){
+            
+            if (!this.w.hasArrow()){
                 action=0;
             }
+            
             switch (action) {
                 case 0:
                     System.out.println("moving");
-    //                this.w.turnDown();
                     this.w.moveForward();
                     break;
                 case 1:
                     System.out.println("shooting");
-    //                this.w.turnRight();
                     this.w.shootForward();
                     break;
             }
