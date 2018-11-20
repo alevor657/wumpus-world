@@ -289,7 +289,7 @@ public class Q {
                 
                 int newStateIndex=-1;
                 double prevValue = this.qTable.get(stateIndex).get(action);
-                double maxy1 = -10000000.0;
+                double maxy1 = Double.NEGATIVE_INFINITY;
                 int[] directs1 = {0,1,2,3};
                 for (int direct: directs1){
                     // if valid 

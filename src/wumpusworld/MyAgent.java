@@ -21,14 +21,7 @@ import java.util.logging.Logger;
 public class MyAgent implements Agent
 {
     private World w;
-//    private int count=-1;
-//    private int[] looper = new int[3];
-//    boolean loop1=false;
-//    boolean loop2=false;
-//    private int grandma= -1;
-//    private int mom = -2;
-//    private int child = -3;
-//    int rnd;
+
     ArrayList<ArrayList<Double>> qtable = null;
     
     /**
