@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class MyAgent implements Agent
 {
-    private World w;
+    public World w;
 
     ArrayList<ArrayList<Double>> qtable = null;
     
@@ -80,9 +80,6 @@ public class MyAgent implements Agent
                     continue;
                 } else if (direct==3 && !this.w.isValidPosition(x-1, y)){
                     continue;
-                } else {
-                    System.out.println("SOME FUCKING SHIT HAPPEND");
-                    System.exit(1);
                 }
                 
                 tempStateIndex = Q.getStateIndex(this.w, x, y, direct);
@@ -148,7 +145,8 @@ public class MyAgent implements Agent
     }
     
     public void train() throws InterruptedException {
-    Q q = new Q(20000, 2, 100000, 0.1, this.w.cloneWorld());
+        Q q = new Q(20000, 2, 20000, 0.1, this.w.cloneWorld());
+        
         try {
             q.train();
         } catch (IOException ex) {

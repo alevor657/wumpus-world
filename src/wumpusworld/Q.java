@@ -29,7 +29,7 @@ public class Q {
     ArrayList<ArrayList<Double>> qTable;
     int epochs;
     double lerningRate;
-    int maxSteps = 100000;
+    int maxSteps = 2000;
     
     World world;
     
@@ -37,7 +37,7 @@ public class Q {
     double epsilon = 1.0;
     double maxEpsilon = 1;
     double minEpsilon = 0.01;
-    double decayRate = 0.9;
+    double decayRate = 0.05;
     
     ArrayList<Integer> rewards;
     
@@ -158,10 +158,15 @@ public class Q {
     public void train() throws IOException {
         for (int i = 0; i < this.epochs; i++) {
             World world = this.world.cloneWorld();
-
-            System.out.println("epoch : " + i);    
+            int turnNr = 0;
             
-            for (int k = 0; k < this.maxSteps; k++) {
+            for (; turnNr < this.maxSteps; turnNr++) {
+                if (world.gameOver()) {
+                    System.out.println("Game ended after " + turnNr + " turns");
+                    System.out.println("HasGold: " + world.hasGold());
+                    break;
+                }
+                
                 boolean wumpusRewardTaken = false;
                 int x = world.getPlayerX();
                 int y = world.getPlayerY();             
@@ -210,6 +215,7 @@ public class Q {
                 }
                 
                 World newWorld = world.cloneWorld();
+                
                 int score1 = newWorld.getScore();
                 
                 if (direction == 0) {
@@ -258,12 +264,14 @@ public class Q {
                         System.out.println(action);
                         System.exit(1);
                 }
-
-                if (newWorld.hasPit(newWorld.getPlayerX(), newWorld.getPlayerY())) {
-                    newWorld.doAction(newWorld.A_CLIMB);
-//                    score1 += 1000;
+                
+                if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
+                    newWorld.doAction(newWorld.A_GRAB);
                 }
                 
+                if (newWorld.hasPit(newWorld.getPlayerX(), newWorld.getPlayerY())) {
+                    newWorld.doAction(newWorld.A_CLIMB);
+                }
                 
                 int score2 = newWorld.getScore();
                 double reward = score2 - score1;
@@ -271,22 +279,17 @@ public class Q {
                 if (!newWorld.wumpusAlive() && !wumpusRewardTaken) {
                     reward += 25;
                     wumpusRewardTaken = true;
-                }
-                
-                if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
-                    newWorld.doAction(newWorld.A_GRAB);
-//                    reward -= 990;
-                }
-                
+                }                
                 
                 if(exploreReward1 && exploreReward2){
-                    reward += 12;
+                    reward += 7;
                 }
                 
                 exploreReward1 = false;
                 exploreReward2 = false;
                 
                 double prevValue = this.qTable.get(stateIndex).get(action);
+                
                 double maxy1 = Double.NEGATIVE_INFINITY;
                 int[] directs1 = {0,1,2,3};
                 for (int direct: directs1){
@@ -301,12 +304,11 @@ public class Q {
                 this.qTable.get(stateIndex).set(action, prevValue + this.lerningRate * (reward + this.gamma * maxy1 - prevValue));
                 
                 world = newWorld;
-                
-                if (newWorld.gameOver()) {
-                    System.out.println("Steps: "+k);
-                    break;
-                }
             }
+            
+            System.out.println("Epoch : " + i);
+            System.out.println("Score: " + world.getScore());
+            System.out.println("GameOver: " + world.gameOver());
             
             this.epsilon = this.minEpsilon + (this.maxEpsilon - this.minEpsilon) * Math.exp(-1 * this.decayRate * i);
         }

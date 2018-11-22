@@ -78,7 +78,7 @@ public class WumpusWorld {
     private void runSimulator()
     {
         double totScore = 0;
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 100000; i++)
         {
             WorldMap w = MapGenerator.getRandomMap(i);
             totScore += (double)runSimulation(w.generateWorld());
