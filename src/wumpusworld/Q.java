@@ -29,9 +29,7 @@ import java.util.Set;
  * @author user
  */
 public class Q {
-    private int actionSize;
-    private int stateSize;
-    ArrayList<ArrayList<Double>> qTable;
+    Map<Integer, ArrayList<Double>> map = new HashMap<>();
     int epochs;
     double lerningRate;
     int maxSteps = 2000;
@@ -43,39 +41,13 @@ public class Q {
     double maxEpsilon = 1;
     double minEpsilon = 0.01;
     double decayRate = 0.0005;
-    
-    ArrayList<Integer> rewards;
-    
-    public Q(int stateSize, int actionSize, int epochs, double learningRate, World w) throws InterruptedException {
-        this.actionSize = actionSize;
-        this.stateSize = stateSize;
+        
+    public Q(int epochs, double learningRate, World w) throws InterruptedException {
         this.epochs = epochs;
         this.lerningRate = learningRate;
         this.world = w;
-        
-        this.qTable = new ArrayList<ArrayList<Double>>();        
-        this.rewards = new ArrayList<>();
-        
-        
-        String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "QTables";
-        File file = new File(path + System.getProperty("file.separator"), "qtable.ser");
-
-        if (file.exists()) {
-            System.out.println("Reading existing table");
-            Thread.sleep(1000);
-            this.qTable = MyAgent.readTable();
-        } else {
-            System.out.println("Creating new qTable");
-            Thread.sleep(1000);
-//            this.initTable();
-        }
-    }
-    
-    private void initTable() {
-        for (int i = 0; i < stateSize; i++) {
-            this.qTable.add(new ArrayList());
-            this.qTable.set(i, new ArrayList(Collections.nCopies(this.actionSize, 0.0)));
-        }
+                
+        this.map = MyAgent.readTable();
     }
     
     public static int getTileValue(World w, int x, int y){
@@ -115,13 +87,6 @@ public class Q {
             return 0;
         }
     }    
-    
-    public static int findIndex(double arr[], double t) 
-    { 
-  
-        int index = Arrays.binarySearch(arr, t); 
-        return (index < 0) ? -1 : index; 
-    } 
     
     public static int getStateIndexEff(World w) {
         int x = w.getPlayerX();
@@ -199,83 +164,32 @@ public class Q {
 
         return index;
     }
-
-//    public static int getStateIndex(World w, int x, int y, int direction) {        
-//        int down = 0;
-//        int right = 0;
-//        int up = 0;
-//        int left = 0;
-//        int tile = 0;
-//        
-//        if (direction == w.DIR_DOWN) {
-//            down = getMagicValue(w, x, y-2);
-//            right = getMagicValue(w, x+1, y-1);
-//            up = getMagicValue(w, x, y);
-//            left = getMagicValue(w, x-1, y-1);
-//            tile = getTileValue(w, x, y-1);
-//            
-//            return 2*(6*(6*(6*(left) + right) + down) + up) + tile;
-//        }else if(direction == w.DIR_RIGHT){
-//            down = getMagicValue(w, x+1, y-1);
-//            right = getMagicValue(w, x+2, y);
-//            up = getMagicValue(w, x+1, y+1);
-//            left = getMagicValue(w, x, y);
-//            tile = getTileValue(w, x+1, y);
-//            
-//            return 2*(6*(6*(6*(up) + down) + right) + left) + tile;
-//        }else if(direction == w.DIR_UP){
-//            down = getMagicValue(w, x, y);
-//            right = getMagicValue(w, x+1, y+1);
-//            up = getMagicValue(w, x, y+2);
-//            left = getMagicValue(w, x-1, y+1);
-//            tile = getTileValue(w, x, y+1);
-//            
-//            return 2*(6*(6*(6*(right) + left) + up) + down) + tile;
-//        }else if(direction == w.DIR_LEFT){
-//            down = getMagicValue(w, x-1, y-1);
-//            right = getMagicValue(w, x, y);
-//            up = getMagicValue(w, x-1, y+1);
-//            left = getMagicValue(w, x-2, y);
-//            tile = getTileValue(w, x-1, y);
-//            
-//            return 2*(6*(6*(6*(down) + up) + left) + right) + tile;
-//        }
-//        
-//        return -1;
-//    }
     
     public void train() throws IOException {
-        int count = 10;
-        int i;
-        int NoOfPreviousTurns = -1;
+        Map<Integer, ArrayList<Double>> map = new HashMap<>();
         
-        Map<Integer, double[]> map = new HashMap<Integer, double[]>();
-//        double[] arrayToPut = new double[] {0,1,2};
-//        map.put("myKey", arrayToPut);
-//        double[] integers = map.get("myKey");
-        
-        for ( i = 0; i < this.epochs; i++) {
+        for (int epoch = 0; epoch < this.epochs; epoch++) {
             World world = this.world.cloneWorld();
             int turnNr = 0;
-            int NoOfTurns = 0;
-            System.out.println("Epoch : " + i);
+            System.out.println("Epoch : " + epoch);
             
             for (; turnNr < this.maxSteps; turnNr++) {
                 if(world.gameOver()){
+                    System.out.println("Game over!");
+                    System.out.println("Turns: " + turnNr);
+                    System.out.println("Has Gold: " + world.hasGold());
                     break;
                 }
+                
                 if (world.hasGlitter(world.getPlayerX(), world.getPlayerY())) {
                     world.doAction(world.A_GRAB);
-                }else{
+                } else {
                     boolean wumpusRewardTaken = false;
                     int x = world.getPlayerX();
                     int y = world.getPlayerY();             
 
                     int stateIndex = this.getStateIndexEff(world);
-                    
-                    double[] arrayToPut = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-                    //        map.put("myKey", arrayToPut);
-
+                   
                     Random r = new Random();
                     double expTradeoff = r.nextDouble();
 
@@ -287,14 +201,14 @@ public class Q {
                     if (expTradeoff > this.epsilon) {
                         stateIndex = this.getStateIndexEff(world);
 
-                        double[] state = map.get(stateIndex);
+                        ArrayList<Double> state = map.get(stateIndex);
                         if(state == null){
-                            state = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+                            state = new ArrayList<Double>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0));
                         }
                         double actionValue;
                         
-                        actionValue = Arrays.stream(state).max().getAsDouble();
-                        action = Arrays.asList(state).indexOf(actionValue);
+                        actionValue = Collections.max(state);
+                        action = state.indexOf(actionValue);
 
                     } else {
                         action = this.getValidRandomMove(world);    
@@ -371,62 +285,37 @@ public class Q {
                     }
 
                     exploreReward2 = false;
-                    
-//                    double[] state = map.get(stateIndex);
-//                    if(state == null){
-//                        state = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//                    }
 
-                    double[] state = map.get(stateIndex);
+                    ArrayList<Double> state = map.get(stateIndex);
                     
                     if(state == null){
-                        state = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+                        state = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0));
                     }
                     double actionValue;
                         
-                    actionValue = Arrays.stream(state).max().getAsDouble();
-                    System.out.println("actionval:"+actionValue);
-                    action = Arrays.asList(state).indexOf(actionValue);
-                    System.out.println("action:"+action);
-                    System.out.println(ArrayUtils.indexOf(state, actionValue));
-                    
+                    actionValue = Collections.max(state);
+                    action = state.indexOf(actionValue);
                     
                     double prevValue = actionValue;
                     
                     int newStateIndex = this.getStateIndexEff(newWorld);
-                    double[] state1 = map.get(newStateIndex);
+                    ArrayList<Double> state1 = map.get(newStateIndex);
+                    
                     if(state1 == null){
-                        state1 = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+                        state = new ArrayList<Double>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0));
                     }
-                    double max = Arrays.stream(state1).max().getAsDouble();
-//
-//                    double[] state2 = map.get(stateIndex);
-//                    if(state2 == null){
-//                        state2 = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-//                    }
+                    
+                    double max = Collections.max(state);
 
-                    state[action] = prevValue + this.lerningRate * (reward + this.gamma * max - prevValue);
+                    state.set(action, prevValue + this.lerningRate * (reward + this.gamma * max - prevValue));
                     map.put(stateIndex, state);
                     world = newWorld;
                 }
             }
-            
-//            System.out.println("Epoch : " + i);
-//            System.out.println("Score: " + world.getScore());
-//            System.out.println("GameOver: " + world.gameOver());
 
-//            if(NoOfPreviousTurns == NoOfTurns){
-//                count--;
-//            }else{
-//                count =10;
-//            }
-//            if(count == 0){
-//                break;
-//            }
-//            NoOfPreviousTurns = NoOfTurns;
-//            this.epsilon = this.minEpsilon + (this.maxEpsilon - this.minEpsilon) * Math.exp(-1 * this.decayRate * i);
+            this.epsilon = this.minEpsilon + (this.maxEpsilon - this.minEpsilon) * Math.exp(-1 * this.decayRate * epoch);
         }
-//        System.out.println("Totsl no of epochs"+i);
+        
         this.serializeQtable();
     }
     
@@ -450,7 +339,7 @@ public class Q {
             
             fout = new FileOutputStream(file, true);
             oos = new ObjectOutputStream(fout);
-            oos.writeObject(this.qTable);
+            oos.writeObject(this.map);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -479,69 +368,6 @@ public class Q {
         int yPos = directions.get(action)[1];
 
         return w.isValidPosition(xPos, yPos);
-    }
-    private int returnValidDirection(World w) {
-        int pX = w.getPlayerX();
-        int pY = w.getPlayerY();
-        
-        ArrayList<int[]> directions = new ArrayList<>();
-//        int[] validDirections = {};
-        ArrayList validDirections = new ArrayList();
-        int down[] = { pX, pY - 1 };
-        int right[] = { pX + 1, pY };
-        int up[] = { pX, pY + 1 };
-        int left[] = { pX -1, pY };
-
-        directions.add(up);
-        directions.add(right);
-        directions.add(down);      
-        directions.add(left);
-        for(int i=0;i<4;i++){
-            int xPos = directions.get(i)[0];
-            int yPos = directions.get(i)[1];
-            
-            if(w.isValidPosition(xPos, yPos)){
-                validDirections.add(i);
-            }
-        }
-        Random r = new Random();
-        int randomVal = r.nextInt(validDirections.size());
-        int randDir = (int) validDirections.get(randomVal);
-        
-
-        return randDir;
-    }
-    
-    private int getValidRandomAction(World w) {
-        Random r = new Random();
-        int randomAction;
-        int x = w.getPlayerX();
-        int y = w.getPlayerY();
-        
-        boolean stench = w.hasStench(x, y);
-        if(stench){
-            randomAction = r.nextInt(2);
-        }else{
-            randomAction = 0;
-        }
-        return randomAction;
-    }
-    
-    private int getNrPossibleMoves(World w) {
-        int pX = w.getPlayerX();
-        int pY = w.getPlayerY();
-
-        int nrPossibleMoves = 4;
-
-        if (pX == 1 || pX == 4) {
-            nrPossibleMoves --;
-        }
-
-        if (pY == 1 || pY == 4) {
-            nrPossibleMoves --;
-        }
-        
-        return nrPossibleMoves;
     }
 
     private int getValidRandomMove(World w) {

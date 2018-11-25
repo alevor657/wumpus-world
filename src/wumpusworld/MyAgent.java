@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import static java.util.Arrays.asList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,7 +71,7 @@ public class MyAgent implements Agent
     }
     
     public void train() throws InterruptedException {
-        Q q = new Q(170000000, 8, 200000, 0.01, this.w.cloneWorld()); //161243150
+        Q q = new Q(100, 0.01, this.w.cloneWorld()); //161243150
         
         try {
             q.train();
@@ -80,10 +81,10 @@ public class MyAgent implements Agent
         System.out.println("Trained!");
     }
     
-    public static ArrayList<ArrayList<Double>> readTable() {
+    public static HashMap<Integer, ArrayList<Double>>readTable() {
         ObjectInputStream objectinputstream = null;
         
-        ArrayList<ArrayList<Double>> qTable = null;
+        HashMap<Integer, ArrayList<Double>> qTable = null;
         
 //        int mapNr = Integer.parseInt(GUI.getSelectedLevel());
         
@@ -93,7 +94,7 @@ public class MyAgent implements Agent
             File in = new File(path, "qtable.ser");
             FileInputStream streamIn = new FileInputStream(in);
             objectinputstream = new ObjectInputStream(streamIn);
-            qTable = (ArrayList<ArrayList<Double>>) objectinputstream.readObject();
+            qTable = (HashMap<Integer, ArrayList<Double>>) objectinputstream.readObject();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

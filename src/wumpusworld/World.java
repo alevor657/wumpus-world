@@ -111,6 +111,8 @@ public class World
     public void shootForward() {
         if (this.hasArrow()) {
             this.doAction(A_SHOOT);
+        } else {
+            System.out.println("NO ARROW!");
         }
     }
     

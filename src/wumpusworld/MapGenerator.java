@@ -29,6 +29,21 @@ public class MapGenerator
         return w;
     }
     
+    
+        public static WorldMap getRandomMapNoSeed()
+    {
+        Random rnd = new Random();
+        WorldMap w = new WorldMap(4);
+        
+        addRandomWumpus(w,rnd);
+        addRandomGold(w,rnd);
+        addRandomPit(w,rnd);
+        addRandomPit(w,rnd);
+        addRandomPit(w,rnd);
+        
+        return w;
+    }
+    
     /**
      * Adds a pit to a random square.
      * 
