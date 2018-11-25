@@ -1,1 +1,2 @@
-Option=sim
+Option=GUI
+Mapfile=maps.txt

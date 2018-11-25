@@ -12,8 +12,13 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * this.qTable is being mutated?
@@ -37,7 +42,7 @@ public class Q {
     double epsilon = 1.0;
     double maxEpsilon = 1;
     double minEpsilon = 0.01;
-    double decayRate = 0.05;
+    double decayRate = 0.0005;
     
     ArrayList<Integer> rewards;
     
@@ -62,7 +67,7 @@ public class Q {
         } else {
             System.out.println("Creating new qTable");
             Thread.sleep(1000);
-            this.initTable();
+//            this.initTable();
         }
     }
     
@@ -109,210 +114,319 @@ public class Q {
             System.exit(0);
             return 0;
         }
-    }        
+    }    
+    
+    public static int findIndex(double arr[], double t) 
+    { 
+  
+        int index = Arrays.binarySearch(arr, t); 
+        return (index < 0) ? -1 : index; 
+    } 
+    
+    public static int getStateIndexEff(World w) {
+        int x = w.getPlayerX();
+        int y = w.getPlayerY();
+        
+        int index=0;
+        int temp1;
+        int temp2;
+        int temp3;
+        int temp4;
+        int temp5;
+        int temp6;
+        int temp7;
+        int temp8;
+        int temp9;
+        int temptile1;
+        int temptile2;
+        int temptile3;
+        int temptile4;
+        
+        
+        temp1 = getMagicValue(w, x, y+2);
+        
+//        index = (temp*Math.pow(10, 12));
+        
+        temp2 = getMagicValue(w, x+1, y+1);
+        
+//        index += temp*Math.pow(10, 11);
+        
+        temp3 = getMagicValue(w, x+2, y);
+        
+//        index += temp*Math.pow(10, 10);
+        
+        temp4 = getMagicValue(w, x+1, y-1);
+        
+//        index += temp*Math.pow(10, 9);
+        
+        temp5 = getMagicValue(w, x, y-2);
+        
+//        index += temp*Math.pow(10, 8);
+        
+        temp6 = getMagicValue(w, x-1, y-1);
+        
+//        index += temp*Math.pow(10, 7);
+        
+        temp7 = getMagicValue(w, x-2, y);
+        
+//        index += temp*Math.pow(10, 6);
+        
+        temp8 = getMagicValue(w, x-1, y+1);
+        
+//        index += temp*Math.pow(10, 5);
+        
+        temptile1 = getTileValue(w, x, y+1);
+        
+//        index += temp*Math.pow(10, 4);
+        
+        temptile2 = getTileValue(w, x+1, y);
+        
+//        index += temp*Math.pow(10, 3);
+        
+        temptile3 = getTileValue(w, x, y-1);
+        
+//        index += temp*Math.pow(10, 2);
+        
+        temptile4 = getTileValue(w, x-1, y);
+        
+//        index += temp*Math.pow(10, 1);
+        
+        temp9 = getMagicValue(w, x, y);
+        
+//        index += temp;
+        
+        index = 2*(2*(2*(2*(6*(6*(6*(6*(6*(6*(6*(6*(temp8) + temp7) + temp6) + temp5) + temp4) + temp3) + temp2) + temp1) + temp9) + temptile1) + temptile2) +temptile3) + temptile4;
 
-    public static int getStateIndex(World w, int x, int y, int direction) {        
-        int down = 0;
-        int right = 0;
-        int up = 0;
-        int left = 0;
-        int tile = 0;
-        
-        if (direction == w.DIR_DOWN) {
-            down = getMagicValue(w, x, y-2);
-            right = getMagicValue(w, x+1, y-1);
-            up = getMagicValue(w, x, y);
-            left = getMagicValue(w, x-1, y-1);
-            tile = getTileValue(w, x, y-1);
-            
-            return 2*(6*(6*(6*(left) + right) + down) + up) + tile;
-        }else if(direction == w.DIR_RIGHT){
-            down = getMagicValue(w, x+1, y-1);
-            right = getMagicValue(w, x+2, y);
-            up = getMagicValue(w, x+1, y+1);
-            left = getMagicValue(w, x, y);
-            tile = getTileValue(w, x+1, y);
-            
-            return 2*(6*(6*(6*(up) + down) + right) + left) + tile;
-        }else if(direction == w.DIR_UP){
-            down = getMagicValue(w, x, y);
-            right = getMagicValue(w, x+1, y+1);
-            up = getMagicValue(w, x, y+2);
-            left = getMagicValue(w, x-1, y+1);
-            tile = getTileValue(w, x, y+1);
-            
-            return 2*(6*(6*(6*(right) + left) + up) + down) + tile;
-        }else if(direction == w.DIR_LEFT){
-            down = getMagicValue(w, x-1, y-1);
-            right = getMagicValue(w, x, y);
-            up = getMagicValue(w, x-1, y+1);
-            left = getMagicValue(w, x-2, y);
-            tile = getTileValue(w, x-1, y);
-            
-            return 2*(6*(6*(6*(down) + up) + left) + right) + tile;
-        }
-        
-        return -1;
+        return index;
     }
+
+//    public static int getStateIndex(World w, int x, int y, int direction) {        
+//        int down = 0;
+//        int right = 0;
+//        int up = 0;
+//        int left = 0;
+//        int tile = 0;
+//        
+//        if (direction == w.DIR_DOWN) {
+//            down = getMagicValue(w, x, y-2);
+//            right = getMagicValue(w, x+1, y-1);
+//            up = getMagicValue(w, x, y);
+//            left = getMagicValue(w, x-1, y-1);
+//            tile = getTileValue(w, x, y-1);
+//            
+//            return 2*(6*(6*(6*(left) + right) + down) + up) + tile;
+//        }else if(direction == w.DIR_RIGHT){
+//            down = getMagicValue(w, x+1, y-1);
+//            right = getMagicValue(w, x+2, y);
+//            up = getMagicValue(w, x+1, y+1);
+//            left = getMagicValue(w, x, y);
+//            tile = getTileValue(w, x+1, y);
+//            
+//            return 2*(6*(6*(6*(up) + down) + right) + left) + tile;
+//        }else if(direction == w.DIR_UP){
+//            down = getMagicValue(w, x, y);
+//            right = getMagicValue(w, x+1, y+1);
+//            up = getMagicValue(w, x, y+2);
+//            left = getMagicValue(w, x-1, y+1);
+//            tile = getTileValue(w, x, y+1);
+//            
+//            return 2*(6*(6*(6*(right) + left) + up) + down) + tile;
+//        }else if(direction == w.DIR_LEFT){
+//            down = getMagicValue(w, x-1, y-1);
+//            right = getMagicValue(w, x, y);
+//            up = getMagicValue(w, x-1, y+1);
+//            left = getMagicValue(w, x-2, y);
+//            tile = getTileValue(w, x-1, y);
+//            
+//            return 2*(6*(6*(6*(down) + up) + left) + right) + tile;
+//        }
+//        
+//        return -1;
+//    }
     
     public void train() throws IOException {
-        for (int i = 0; i < this.epochs; i++) {
+        int count = 10;
+        int i;
+        int NoOfPreviousTurns = -1;
+        
+        Map<Integer, double[]> map = new HashMap<Integer, double[]>();
+//        double[] arrayToPut = new double[] {0,1,2};
+//        map.put("myKey", arrayToPut);
+//        double[] integers = map.get("myKey");
+        
+        for ( i = 0; i < this.epochs; i++) {
             World world = this.world.cloneWorld();
             int turnNr = 0;
+            int NoOfTurns = 0;
+            System.out.println("Epoch : " + i);
             
             for (; turnNr < this.maxSteps; turnNr++) {
-                if (world.gameOver()) {
-                    System.out.println("Game ended after " + turnNr + " turns");
-                    System.out.println("HasGold: " + world.hasGold());
+                if(world.gameOver()){
                     break;
                 }
-                
-                boolean wumpusRewardTaken = false;
-                int x = world.getPlayerX();
-                int y = world.getPlayerY();             
-                
-                int stateIndex = this.getStateIndex(world, x, y, world.getDirection());
-                Random r = new Random();
-                double expTradeoff = r.nextDouble();
-                
-                boolean exploreReward1 = false;
-                boolean exploreReward2 = false;
-                
-                int action = -10;
-                int direction = -1;
-                double maxVal = 0.0;
-                double maxy = Double.NEGATIVE_INFINITY;
-                int tempStateIndex;
-                
-                if (expTradeoff > this.epsilon) {
-                    int bestDirection = -1;
-                    int[] directs = {0, 1, 2, 3};
-                    for (int direct : directs) {
-                        if (direct == 0 && !world.isValidPosition(x, y + 1)) {
-                            continue;
-                        } else if (direct == 1 && !world.isValidPosition(x + 1, y)) {
-                            continue;
-                        } else if (direct == 2 && !world.isValidPosition(x, y - 1)) {
-                            continue;
-                        } else if (direct == 3 && !world.isValidPosition(x - 1, y)) {
-                            continue;
-                        }
-                        tempStateIndex = this.getStateIndex(world, x, y, direct);
-                        maxVal = Collections.max(this.qTable.get(tempStateIndex));
+                if (world.hasGlitter(world.getPlayerX(), world.getPlayerY())) {
+                    world.doAction(world.A_GRAB);
+                }else{
+                    boolean wumpusRewardTaken = false;
+                    int x = world.getPlayerX();
+                    int y = world.getPlayerY();             
 
-                        if (maxVal > maxy) {
-                            stateIndex = tempStateIndex;
-                            maxy = maxVal;
-                            bestDirection = direct;
+                    int stateIndex = this.getStateIndexEff(world);
+                    
+                    double[] arrayToPut = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+                    //        map.put("myKey", arrayToPut);
+
+                    Random r = new Random();
+                    double expTradeoff = r.nextDouble();
+
+                    boolean exploreReward1 = false;
+                    boolean exploreReward2 = false;
+
+                    int action = -10;
+
+                    if (expTradeoff > this.epsilon) {
+                        stateIndex = this.getStateIndexEff(world);
+
+                        double[] state = map.get(stateIndex);
+                        if(state == null){
+                            state = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
                         }
+                        double actionValue;
+                        
+                        actionValue = Arrays.stream(state).max().getAsDouble();
+                        action = Arrays.asList(state).indexOf(actionValue);
+
+                    } else {
+                        action = this.getValidRandomMove(world);    
                     }
-                    direction = bestDirection;
-                    action = this.qTable.get(stateIndex).indexOf(maxy);
+
+                    World newWorld = world.cloneWorld();
+
+                    int score1 = newWorld.getScore();
+
+                    switch (action) {
+                        case 0:
+                            newWorld.turnUp();
+                            newWorld.moveForward();
+                            if(!newWorld.isVisited(x, y+1)){
+                                exploreReward2 = true;
+                            }
+                            break;
+                        case 1:
+                            newWorld.turnRight();
+                            newWorld.moveForward();
+                            if(!newWorld.isVisited(x+1, y)){
+                                exploreReward2 = true;
+                            }
+                            break;
+                        case 2:
+                            newWorld.turnDown();
+                            newWorld.moveForward();
+                            if(!newWorld.isVisited(x, y-1)){
+                                exploreReward2 = true;
+                            }
+                            break;
+                        case 3:
+                            newWorld.turnLeft();
+                            newWorld.moveForward();
+                            if(!newWorld.isVisited(x-1, y)){
+                                exploreReward2 = true;
+                            }
+                            break;
+                        case 4:
+                            newWorld.turnUp();
+                            newWorld.shootForward();
+                            break;
+                        case 5:
+                            newWorld.turnRight();
+                            newWorld.shootForward();
+                            break;
+                        case 6:
+                            newWorld.turnDown();
+                            newWorld.shootForward();
+                            break;
+                        case 7:
+                            newWorld.turnLeft();
+                            newWorld.shootForward();
+                            break;
+                        default:
+                            System.out.println("action != 1 - 7");
+                            System.exit(1);
+                    }
+
+                    if (newWorld.hasPit(newWorld.getPlayerX(), newWorld.getPlayerY())) {
+                        newWorld.doAction(newWorld.A_CLIMB);
+                    }
+
+                    int score2 = newWorld.getScore();
+                    double reward = score2 - score1;
+
+                    if (!newWorld.wumpusAlive() && !wumpusRewardTaken) {
+                        reward += 25;
+                        wumpusRewardTaken = true;
+                    }                
+
+                    if(exploreReward2){
+                        reward += 7;
+                    }
+
+                    exploreReward2 = false;
                     
-                } else {
-                    direction = this.returnValidDirection(world);
-                    action = this.getValidRandomAction(world);    
-                }
-                
-                World newWorld = world.cloneWorld();
-                
-                int score1 = newWorld.getScore();
-                
-                if (direction == 0) {
-                    newWorld.turnUp();
-//                    System.out.println("GOING up");
-                    if(!newWorld.isVisited(x, y+1)){
-                        exploreReward1 = true;
-                    }
-                } else if(direction == 1) {
-                    newWorld.turnRight();
-    //                    System.out.println("GOING right");
-                    if(!newWorld.isVisited(x+1, y)){
-                        exploreReward1 = true;
-                    }
-                } else if(direction == 2) {
-                    newWorld.turnDown();
-//                    System.out.println("GOING down");
-                    if(!newWorld.isVisited(x, y-1)){
-                        exploreReward1 = true;
-                    }
-                } else if(direction == 3) {
-                    newWorld.turnLeft();
-//                    System.out.println("GOING left");
-                    if(!newWorld.isVisited(x-1, y)){
-                        exploreReward1 = true;
-                    }
-                } else{
-                    System.out.println("Direction is wrong!!");
-                    System.exit(0);
-                }
-                
-                switch (action) {
-                    case 0:
-//                        newWorld.turnDown();
-                        newWorld.moveForward();
-                        exploreReward2 = true;
-                        break;
-                    case 1:
-//                        newWorld.turnRight();
-                        newWorld.shootForward();
-                        newWorld.hasArrow = true;
-                        break;
+//                    double[] state = map.get(stateIndex);
+//                    if(state == null){
+//                        state = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+//                    }
+
+                    double[] state = map.get(stateIndex);
                     
-                    default:
-                        System.out.println("action != 1 - 7");
-                        System.out.println(action);
-                        System.exit(1);
-                }
-                
-                if (newWorld.hasGlitter(newWorld.getPlayerX(), newWorld.getPlayerY())) {
-                    newWorld.doAction(newWorld.A_GRAB);
-                }
-                
-                if (newWorld.hasPit(newWorld.getPlayerX(), newWorld.getPlayerY())) {
-                    newWorld.doAction(newWorld.A_CLIMB);
-                }
-                
-                int score2 = newWorld.getScore();
-                double reward = score2 - score1;
-                
-                if (!newWorld.wumpusAlive() && !wumpusRewardTaken) {
-                    reward += 25;
-                    wumpusRewardTaken = true;
-                }                
-                
-                if(exploreReward1 && exploreReward2){
-                    reward += 7;
-                }
-                
-                exploreReward1 = false;
-                exploreReward2 = false;
-                
-                double prevValue = this.qTable.get(stateIndex).get(action);
-                
-                double maxy1 = Double.NEGATIVE_INFINITY;
-                int[] directs1 = {0,1,2,3};
-                for (int direct: directs1){
-                    // if valid 
-                    tempStateIndex = this.getStateIndex(newWorld, x, y, direct);
-                    maxVal = this.qTable.get(tempStateIndex).get(0);
-                    if(maxVal > maxy1){
-                        maxy1 = maxVal;
+                    if(state == null){
+                        state = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
                     }
+                    double actionValue;
+                        
+                    actionValue = Arrays.stream(state).max().getAsDouble();
+                    System.out.println("actionval:"+actionValue);
+                    action = Arrays.asList(state).indexOf(actionValue);
+                    System.out.println("action:"+action);
+                    System.out.println(ArrayUtils.indexOf(state, actionValue));
+                    
+                    
+                    double prevValue = actionValue;
+                    
+                    int newStateIndex = this.getStateIndexEff(newWorld);
+                    double[] state1 = map.get(newStateIndex);
+                    if(state1 == null){
+                        state1 = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+                    }
+                    double max = Arrays.stream(state1).max().getAsDouble();
+//
+//                    double[] state2 = map.get(stateIndex);
+//                    if(state2 == null){
+//                        state2 = new double[] {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+//                    }
+
+                    state[action] = prevValue + this.lerningRate * (reward + this.gamma * max - prevValue);
+                    map.put(stateIndex, state);
+                    world = newWorld;
                 }
-                
-                this.qTable.get(stateIndex).set(action, prevValue + this.lerningRate * (reward + this.gamma * maxy1 - prevValue));
-                
-                world = newWorld;
             }
             
-            System.out.println("Epoch : " + i);
-            System.out.println("Score: " + world.getScore());
-            System.out.println("GameOver: " + world.gameOver());
-            
-            this.epsilon = this.minEpsilon + (this.maxEpsilon - this.minEpsilon) * Math.exp(-1 * this.decayRate * i);
+//            System.out.println("Epoch : " + i);
+//            System.out.println("Score: " + world.getScore());
+//            System.out.println("GameOver: " + world.gameOver());
+
+//            if(NoOfPreviousTurns == NoOfTurns){
+//                count--;
+//            }else{
+//                count =10;
+//            }
+//            if(count == 0){
+//                break;
+//            }
+//            NoOfPreviousTurns = NoOfTurns;
+//            this.epsilon = this.minEpsilon + (this.maxEpsilon - this.minEpsilon) * Math.exp(-1 * this.decayRate * i);
         }
-        
+//        System.out.println("Totsl no of epochs"+i);
         this.serializeQtable();
     }
     
@@ -346,26 +460,26 @@ public class Q {
         }
     }
     
-//    private boolean checkValidAction(int action, World w) {
-//        int pX = w.getPlayerX();
-//        int pY = w.getPlayerY();
-//        
-//        ArrayList<int[]> directions = new ArrayList<>();
-//        int down[] = { pX, pY - 1 };
-//        int right[] = { pX + 1, pY };
-//        int up[] = { pX, pY + 1 };
-//        int left[] = { pX -1, pY };
-//
-//        directions.add(down);
-//        directions.add(right);
-//        directions.add(up);
-//        directions.add(left);
-//        
-//        int xPos = directions.get(action)[0];
-//        int yPos = directions.get(action)[1];
-//
-//        return w.isValidPosition(xPos, yPos);
-//    }
+    private boolean checkValidAction(int action, World w) {
+        int pX = w.getPlayerX();
+        int pY = w.getPlayerY();
+        
+        ArrayList<int[]> directions = new ArrayList<>();
+        int down[] = { pX, pY - 1 };
+        int right[] = { pX + 1, pY };
+        int up[] = { pX, pY + 1 };
+        int left[] = { pX -1, pY };
+
+        directions.add(down);
+        directions.add(right);
+        directions.add(up);
+        directions.add(left);
+        
+        int xPos = directions.get(action)[0];
+        int yPos = directions.get(action)[1];
+
+        return w.isValidPosition(xPos, yPos);
+    }
     private int returnValidDirection(World w) {
         int pX = w.getPlayerX();
         int pY = w.getPlayerY();
@@ -428,5 +542,29 @@ public class Q {
         }
         
         return nrPossibleMoves;
+    }
+
+    private int getValidRandomMove(World w) {
+        Random r = new Random();
+        
+        while (true) {
+            int randomAction;
+            
+            if (w.hasArrow()) {
+                randomAction = r.nextInt(8);
+            } else {
+                randomAction = r.nextInt(4);
+            }
+            
+            if (randomAction < 4) {
+                if (this.checkValidAction(randomAction, w)) {
+                    return randomAction;
+                }
+            } else {
+                if (this.checkValidAction(randomAction - 4, w)) {
+                    return randomAction;
+                }
+            }
+        }
     }
 }
