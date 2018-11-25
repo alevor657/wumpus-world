@@ -66,15 +66,23 @@ public class MyAgent implements Agent
             Integer stateIndex = Q.getStateIndexEff(this.w);
 
             ArrayList<Double> state = this.map.get(stateIndex);
-            System.out.println(Arrays.toString(this.map.keySet().toArray()));
-            System.out.println(this.map.size());
-            System.out.println(state);
-            System.exit(0);
+            
+            System.out.println("State: ");
+            System.out.println(state.toString());
 
             double actionValue;
 
-            actionValue = Collections.max(state);
-            Integer action = state.indexOf(actionValue);
+           
+            Integer action;
+            
+            if (!this.w.hasArrow()) {
+                actionValue = Collections.max(state.subList(0, 4));
+            } else {
+                actionValue = Collections.max(state);
+            }
+            
+            action = state.indexOf(actionValue);
+
             
             switch (action) {
             case 0:
@@ -113,11 +121,14 @@ public class MyAgent implements Agent
                 System.out.println("action != 1 - 7");
                 System.exit(1);
             }
+            
+            System.out.println("Action: ");
+            System.out.println(action);
         }
     }
     
     public void train() throws InterruptedException {
-        Q q = new Q(150000, 0.01, this.w.cloneWorld()); //161243150
+        Q q = new Q(20000, 0.01, this.w.cloneWorld()); //161243150
         
         try {
             q.train();

@@ -40,7 +40,7 @@ public class Q {
     double epsilon = 1.0;
     double maxEpsilon = 1;
     double minEpsilon = 0.01;
-    double decayRate = 0.0005;
+    double decayRate = 0.05;
         
     public Q(int epochs, double learningRate, World w) throws InterruptedException {
         this.epochs = epochs;
@@ -289,19 +289,22 @@ public class Q {
 
                     int action = -10;
 
-                    if (expTradeoff > this.epsilon) {
-                        stateIndex = Q.getStateIndexEff(world);
+                    stateIndex = Q.getStateIndexEff(world);
 
-                        ArrayList<Double> state = map.get(stateIndex);
-                        
-                        if(state == null){
-                            state = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0));
-                        }
+                    ArrayList<Double> state = map.get(stateIndex);
+
+                    if(state == null){
+//                        state = new ArrayList<>(Arrays.asList(-10000.0,-10000.0,-10000.0,-10000.0,-10000.0,-10000.0,-10000.0,-10000.0));
+                        state = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0));
+
+                    }
+                    
+                    if (expTradeoff > this.epsilon) {
+                       
                         double actionValue;
                         
                         actionValue = Collections.max(state);
                         action = state.indexOf(actionValue);
-
                     } else {
                         action = this.getValidRandomMove(world);    
                     }
@@ -378,11 +381,6 @@ public class Q {
 
                     exploreReward2 = false;
 
-                    ArrayList<Double> state = map.get(stateIndex);
-                    
-                    if(state == null){
-                        state = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0));
-                    }
                     double actionValue;
                         
                     actionValue = Collections.max(state);
@@ -394,10 +392,12 @@ public class Q {
                     ArrayList<Double> state1 = map.get(newStateIndex);
                     
                     if(state1 == null){
-                        state = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0));
+//                        state1 = new ArrayList<>(Arrays.asList(-10000.0,-10000.0,-10000.0,-10000.0,-10000.0,-10000.0,-10000.0,-10000.0));
+                        state1 = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0));
+
                     }
                     
-                    double max = Collections.max(state);
+                    double max = Collections.max(state1);
 
                     state.set(action, prevValue + this.lerningRate * (reward + this.gamma * max - prevValue));
                     map.put(stateIndex, state);
