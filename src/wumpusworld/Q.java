@@ -58,6 +58,14 @@ public class Q {
         }
     }
     
+    public static char getTileCode(World w, int x, int y){
+        if(!w.isVisited(x, y)){
+            return 'z';
+        }else{
+            return 'e';
+        }
+    }
+    
     public static int getMagicValue(World w, int x, int y) {
         boolean stench;
         boolean breeze;
@@ -164,10 +172,92 @@ public class Q {
 
         return index;
     }
-    
-    public void train() throws IOException {
-        Map<Integer, ArrayList<Double>> map = new HashMap<>();
+
+    public static char getCode(World w, int x, int y) {
+        boolean stench;
+        boolean breeze;
         
+        stench = w.hasStench(x, y);
+        breeze = w.hasBreeze(x, y);
+            
+        if (!w.isValidPosition(x, y)) {
+            return 'i';
+        } else if (!w.isVisited(x, y)) {
+            return 'u';
+        } else if (breeze && stench) {
+            return 'd';
+        } else if (stench) {
+            return 's';
+        } else if (breeze) {
+            return 'b';
+        } else {
+           return 'n';
+        }
+    } 
+    
+//    public static String getKey(World w) {
+//        int x = w.getPlayerX();
+//        int y = w.getPlayerY();
+//        
+//        char temp1;
+//        char temp2;
+//        char temp3;
+//        char temp4;
+//        char temp5;
+//        char temp6;
+//        char temp7;
+//        char temp8;
+//        char temp9;
+//        char temptile1;
+//        char temptile2;
+//        char temptile3;
+//        char temptile4;
+//        
+//        String key = "";
+//
+//        temp1 = getCode(w, x, y+2);
+//        key += temp1;
+//        
+//        temp2 = getCode(w, x+1, y+1);
+//        key += temp2;
+//
+//        temp3 = getCode(w, x+2, y);
+//        key += temp3;
+//        
+//        temp4 = getCode(w, x+1, y-1);
+//        key += temp4;
+//        
+//        temp5 = getCode(w, x, y-2);
+//        key += temp5;
+//        
+//        temp6 = getCode(w, x-1, y-1);
+//        key += temp6;
+//        
+//        temp7 = getCode(w, x-2, y);
+//        key += temp7;
+//        
+//        temp8 = getCode(w, x-1, y+1);
+//        key += temp8;
+//        
+//        temptile1 = getTileCode(w, x, y+1);
+//        key += temptile1;
+//        
+//        temptile2 = getTileCode(w, x+1, y);
+//        key += temptile2;
+//        
+//        temptile3 = getTileCode(w, x, y-1);
+//        key += temptile3;
+//        
+//        temptile4 = getTileCode(w, x-1, y);
+//        key += temptile4;
+//        
+//        temp9 = getCode(w, x, y);
+//        key += temp9;
+//        
+//        return key;
+//    }
+
+    public void train() throws IOException {        
         for (int epoch = 0; epoch < this.epochs; epoch++) {
             World world = this.world.cloneWorld();
             int turnNr = 0;
@@ -178,6 +268,7 @@ public class Q {
                     System.out.println("Game over!");
                     System.out.println("Turns: " + turnNr);
                     System.out.println("Has Gold: " + world.hasGold());
+                    System.out.println("Epsilon: " + this.epsilon);
                     break;
                 }
                 
@@ -188,7 +279,7 @@ public class Q {
                     int x = world.getPlayerX();
                     int y = world.getPlayerY();             
 
-                    int stateIndex = this.getStateIndexEff(world);
+                    Integer stateIndex = Q.getStateIndexEff(world);
                    
                     Random r = new Random();
                     double expTradeoff = r.nextDouble();
@@ -199,11 +290,12 @@ public class Q {
                     int action = -10;
 
                     if (expTradeoff > this.epsilon) {
-                        stateIndex = this.getStateIndexEff(world);
+                        stateIndex = Q.getStateIndexEff(world);
 
                         ArrayList<Double> state = map.get(stateIndex);
+                        
                         if(state == null){
-                            state = new ArrayList<Double>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0));
+                            state = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0));
                         }
                         double actionValue;
                         
@@ -298,11 +390,11 @@ public class Q {
                     
                     double prevValue = actionValue;
                     
-                    int newStateIndex = this.getStateIndexEff(newWorld);
+                    Integer newStateIndex = Q.getStateIndexEff(newWorld);
                     ArrayList<Double> state1 = map.get(newStateIndex);
                     
                     if(state1 == null){
-                        state = new ArrayList<Double>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0));
+                        state = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0));
                     }
                     
                     double max = Collections.max(state);
@@ -328,7 +420,7 @@ public class Q {
 //        System.out.println("Writing msp nr " + mapNr);
                         
         try {
-            String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "QTables";
+            String path = System.getProperty("user.dir") + System.getProperty("file.separator");
             new File(path).mkdir();
 //            File file = new File(path + System.getProperty("file.separator"), "qtable" + mapNr + ".ser");
             File file = new File(path + System.getProperty("file.separator"), "qtable.ser");

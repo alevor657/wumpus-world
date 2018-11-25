@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,8 +23,7 @@ import java.util.logging.Logger;
 public class MyAgent implements Agent
 {
     public World w;
-
-    ArrayList<ArrayList<Double>> qtable = null;
+    Map<Integer, ArrayList<Double>> map;
     
     /**
      * Creates a new instance of your solver agent.
@@ -41,8 +41,9 @@ public class MyAgent implements Agent
      */
     public void doAction()
     {
-//        if (this.qtable == null) {
-//            this.qtable = MyAgent.readTable();
+//        if (this.map == null) {
+//            System.out.println("Reading existing table");
+//            this.map = MyAgent.readTable();
 //        }
 //
 //        this.doTurn();
@@ -54,24 +55,69 @@ public class MyAgent implements Agent
         }
     }
     
-    public void doTurn() {
+    public void doTurn() {        
         if (this.w.hasGlitter(this.w.getPlayerX(), this.w.getPlayerY())) {
             this.w.doAction(this.w.A_GRAB);
         } else {
             if (this.w.hasPit(this.w.getPlayerX(), this.w.getPlayerY())) {
                 this.w.doAction(this.w.A_CLIMB);
             }
-            ArrayList<ArrayList<Double>> qtable = this.qtable;
-            int x = this.w.getPlayerX();
-            int y = this.w.getPlayerY();
-            double stateIndex = Q.getStateIndexEff(this.w);
-                        
             
+            Integer stateIndex = Q.getStateIndexEff(this.w);
+
+            ArrayList<Double> state = this.map.get(stateIndex);
+            System.out.println(Arrays.toString(this.map.keySet().toArray()));
+            System.out.println(this.map.size());
+            System.out.println(state);
+            System.exit(0);
+
+            double actionValue;
+
+            actionValue = Collections.max(state);
+            Integer action = state.indexOf(actionValue);
+            
+            switch (action) {
+            case 0:
+                this.w.turnUp();
+                this.w.moveForward();
+                break;
+            case 1:
+                this.w.turnRight();
+                this.w.moveForward();
+                break;
+            case 2:
+                this.w.turnDown();
+                this.w.moveForward();
+                break;
+            case 3:
+                this.w.turnLeft();
+                this.w.moveForward();
+                break;
+            case 4:
+                this.w.turnUp();
+                this.w.shootForward();
+                break;
+            case 5:
+                this.w.turnRight();
+                this.w.shootForward();
+                break;
+            case 6:
+                this.w.turnDown();
+                this.w.shootForward();
+                break;
+            case 7:
+                this.w.turnLeft();
+                this.w.shootForward();
+                break;
+            default:
+                System.out.println("action != 1 - 7");
+                System.exit(1);
+            }
         }
     }
     
     public void train() throws InterruptedException {
-        Q q = new Q(100, 0.01, this.w.cloneWorld()); //161243150
+        Q q = new Q(150000, 0.01, this.w.cloneWorld()); //161243150
         
         try {
             q.train();
@@ -85,13 +131,16 @@ public class MyAgent implements Agent
         ObjectInputStream objectinputstream = null;
         
         HashMap<Integer, ArrayList<Double>> qTable = null;
-        
-//        int mapNr = Integer.parseInt(GUI.getSelectedLevel());
-        
+                
         try {
-            String path = System.getProperty("user.dir") + System.getProperty("file.separator") + "QTables";
-//            File in = new File(path, "qtable" + mapNr + ".ser");
+            String path = System.getProperty("user.dir") + System.getProperty("file.separator");
             File in = new File(path, "qtable.ser");
+            
+            if (!in.exists()) {
+                System.out.println("File does not exists");
+                return new HashMap<>();
+            }
+            
             FileInputStream streamIn = new FileInputStream(in);
             objectinputstream = new ObjectInputStream(streamIn);
             qTable = (HashMap<Integer, ArrayList<Double>>) objectinputstream.readObject();
