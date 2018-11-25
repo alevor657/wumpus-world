@@ -86,6 +86,14 @@ public class Q {
         }
     }
     
+    public static char getTileCode(World w, int x, int y){
+        if(!w.isVisited(x, y)){
+            return 'z';
+        }else{
+            return 'e';
+        }
+    }
+    
     public static int getMagicValue(World w, int x, int y) {
         boolean stench;
         boolean breeze;
@@ -200,50 +208,90 @@ public class Q {
         return index;
     }
 
-//    public static int getStateIndex(World w, int x, int y, int direction) {        
-//        int down = 0;
-//        int right = 0;
-//        int up = 0;
-//        int left = 0;
-//        int tile = 0;
-//        
-//        if (direction == w.DIR_DOWN) {
-//            down = getMagicValue(w, x, y-2);
-//            right = getMagicValue(w, x+1, y-1);
-//            up = getMagicValue(w, x, y);
-//            left = getMagicValue(w, x-1, y-1);
-//            tile = getTileValue(w, x, y-1);
-//            
-//            return 2*(6*(6*(6*(left) + right) + down) + up) + tile;
-//        }else if(direction == w.DIR_RIGHT){
-//            down = getMagicValue(w, x+1, y-1);
-//            right = getMagicValue(w, x+2, y);
-//            up = getMagicValue(w, x+1, y+1);
-//            left = getMagicValue(w, x, y);
-//            tile = getTileValue(w, x+1, y);
-//            
-//            return 2*(6*(6*(6*(up) + down) + right) + left) + tile;
-//        }else if(direction == w.DIR_UP){
-//            down = getMagicValue(w, x, y);
-//            right = getMagicValue(w, x+1, y+1);
-//            up = getMagicValue(w, x, y+2);
-//            left = getMagicValue(w, x-1, y+1);
-//            tile = getTileValue(w, x, y+1);
-//            
-//            return 2*(6*(6*(6*(right) + left) + up) + down) + tile;
-//        }else if(direction == w.DIR_LEFT){
-//            down = getMagicValue(w, x-1, y-1);
-//            right = getMagicValue(w, x, y);
-//            up = getMagicValue(w, x-1, y+1);
-//            left = getMagicValue(w, x-2, y);
-//            tile = getTileValue(w, x-1, y);
-//            
-//            return 2*(6*(6*(6*(down) + up) + left) + right) + tile;
-//        }
-//        
-//        return -1;
-//    }
+    public static char getCode(World w, int x, int y) {
+        boolean stench;
+        boolean breeze;
+        
+        stench = w.hasStench(x, y);
+        breeze = w.hasBreeze(x, y);
+            
+        if (!w.isValidPosition(x, y)) {
+            return 'i';
+        } else if (!w.isVisited(x, y)) {
+            return 'u';
+        } else if (breeze && stench) {
+            return 'd';
+        } else if (stench) {
+            return 's';
+        } else if (breeze) {
+            return 'b';
+        } else {
+           return 'n';
+        }
+    } 
     
+    public static String getKey(World w) {
+        int x = w.getPlayerX();
+        int y = w.getPlayerY();
+        
+        char temp1;
+        char temp2;
+        char temp3;
+        char temp4;
+        char temp5;
+        char temp6;
+        char temp7;
+        char temp8;
+        char temp9;
+        char temptile1;
+        char temptile2;
+        char temptile3;
+        char temptile4;
+        
+        String key = "";
+
+        temp1 = getCode(w, x, y+2);
+        key += temp1;
+        
+        temp2 = getCode(w, x+1, y+1);
+        key += temp2;
+
+        temp3 = getCode(w, x+2, y);
+        key += temp3;
+        
+        temp4 = getCode(w, x+1, y-1);
+        key += temp4;
+        
+        temp5 = getCode(w, x, y-2);
+        key += temp5;
+        
+        temp6 = getCode(w, x-1, y-1);
+        key += temp6;
+        
+        temp7 = getCode(w, x-2, y);
+        key += temp7;
+        
+        temp8 = getCode(w, x-1, y+1);
+        key += temp8;
+        
+        temptile1 = getTileCode(w, x, y+1);
+        key += temptile1;
+        
+        temptile2 = getTileCode(w, x+1, y);
+        key += temptile2;
+        
+        temptile3 = getTileCode(w, x, y-1);
+        key += temptile3;
+        
+        temptile4 = getTileCode(w, x-1, y);
+        key += temptile4;
+        
+        temp9 = getCode(w, x, y);
+        key += temp9;
+        
+        return key;
+    }
+
     public void train() throws IOException {
         int count = 10;
         int i;
@@ -253,7 +301,7 @@ public class Q {
 //        double[] arrayToPut = new double[] {0,1,2};
 //        map.put("myKey", arrayToPut);
 //        double[] integers = map.get("myKey");
-        
+        System.out.println(getKey(this.world));
         for ( i = 0; i < this.epochs; i++) {
             World world = this.world.cloneWorld();
             int turnNr = 0;
@@ -388,7 +436,6 @@ public class Q {
                     System.out.println("actionval:"+actionValue);
                     action = Arrays.asList(state).indexOf(actionValue);
                     System.out.println("action:"+action);
-                    System.out.println(ArrayUtils.indexOf(state, actionValue));
                     
                     
                     double prevValue = actionValue;
