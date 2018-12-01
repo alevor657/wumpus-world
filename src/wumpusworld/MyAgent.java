@@ -647,9 +647,39 @@ public class MyAgent implements Agent
                 }else if(X == bestx && Y-1 == besty){
                     w.turnDown();
                     w.moveForward();
-;
+
                 }
-//            this.shitFlag = false;
+            int xx = w.getPlayerX();
+            int yy = w.getPlayerY();
+            if(w.isValidPosition(xx+1, yy) && !w.isVisited(xx+1, yy)){
+                if(this.possibleMoves.indexOf(4*(xx+1)+yy)== -1){
+                    this.possibleMoves.add(4*(xx+1)+yy);
+//                    System.out.println("Added:"+(4*(xx+1)+yy));
+                }
+               
+            }
+            if(w.isValidPosition(xx-1, yy) && !w.isVisited(xx-1, yy)){
+                if(this.possibleMoves.indexOf(4*(xx-1)+yy)== -1){
+                    this.possibleMoves.add(4*(xx-1)+yy);
+//                    System.out.println("Added:"+(4*(xx-1)+yy));
+                }
+                
+            }
+            if(w.isValidPosition(xx, yy+1) && !w.isVisited(xx, yy+1)){
+                if(this.possibleMoves.indexOf(4*(xx)+yy+1)== -1){
+                    this.possibleMoves.add(4*(xx)+yy+1);
+//                    System.out.println("Added:"+(4*(xx)+yy+1));
+                }
+                
+            }
+            if(w.isValidPosition(xx, yy-1) && !w.isVisited(xx, yy-1)){
+                if(this.possibleMoves.indexOf(4*(xx)+yy-1)== -1){
+                    this.possibleMoves.add(4*(xx)+yy-1);
+//                    System.out.println("Added:"+(4*(xx)+yy-1));
+                }
+                
+            }
+            this.shitFlag = false;
             return;
         }
         if(this.stillMoving){
@@ -723,10 +753,10 @@ public class MyAgent implements Agent
                 System.out.println("Best move:"+bestMove);
     //            System.out.println("constructing the path");
                 constructPath(4*X+Y, bestMove);
-                if(this.shitFlag == true){
-                    this.shitFlag = false;
-                    return;
-                }
+//                if(this.shitFlag == true){
+//                    this.shitFlag = false;
+//                    return;
+//                }
                 this.Path.add(bestMove);
                 System.out.println("Added:"+bestMove);
                 
