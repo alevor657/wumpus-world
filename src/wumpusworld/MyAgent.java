@@ -16,6 +16,7 @@ public class MyAgent implements Agent
     ArrayList<Integer> Path = new ArrayList<Integer>();
     boolean stillMoving = false;
     boolean shitFlag = false;
+    boolean obstruction = false;
     /**
      * Creates a new instance of your solver agent.
      * 
@@ -24,80 +25,22 @@ public class MyAgent implements Agent
     public MyAgent(World world)
     {
         w = world;
-//        this.possibleMoves.add(5);
         this.possibleMoves.add(6);
         this.possibleMoves.add(9);
-//        this.possibleMoves.add(14);
     }
     
     public int pitDanger(World w, int x, int y){
-//        int danger = 0;
-//        
-//        if(w.hasBreeze(x, y+1)){
-//            danger += 1; 
-//        }
-//        if(w.hasBreeze(x+1, y)){
-//            danger += 1; 
-//        }
-//        if(w.hasBreeze(x, y-1)){
-//            danger += 1; 
-//        }
-//        if(w.hasBreeze(x-1, y)){
-//            danger += 1; 
-//        }
-//        
-//        if(!w.isValidPosition(x, y+1) || !w.isVisited(x, y+1)){
-//            if(w.hasBreeze(x+1, y)){
-//                danger += 1; 
-//            }
-//            if(w.hasBreeze(x, y-1)){
-//                danger += 1; 
-//            }
-//            if(w.hasBreeze(x-1, y)){
-//                danger += 1; 
-//            }
-//        }
-//        
-//        if(!w.isValidPosition(x+1, y) || !w.isVisited(x+1, y)){
-//            if(w.hasBreeze(x, y+1)){
-//                danger += 1; 
-//            }
-//            
-//            if(w.hasBreeze(x, y-1)){
-//                danger += 1; 
-//            }
-//            if(w.hasBreeze(x-1, y)){
-//                danger += 1; 
-//            }
-//        }
-//        
-//        if(!w.isValidPosition(x, y-1) || !w.isVisited(x, y-1)){
-//            if(w.hasBreeze(x, y+1)){
-//                danger += 1; 
-//            }
-//            if(w.hasBreeze(x+1, y)){
-//                danger += 1; 
-//            }
-//
-//            if(w.hasBreeze(x-1, y)){
-//                danger += 1; 
-//            }
-//        }
-//        
-//        if(!w.isValidPosition(x-1, y) || !w.isVisited(x-1, y)){
-//            if(w.hasBreeze(x, y+1)){
-//                danger += 1; 
-//            }
-//            if(w.hasBreeze(x+1, y)){
-//                danger += 1; 
-//            }
-//            if(w.hasBreeze(x, y-1)){
-//                danger += 1; 
-//            }
-//        }
-//        
-//        return danger;
 
+        if(w.isVisited(x, y+1) && !w.hasBreeze(x, y+1)){
+            return 0;
+        }else if(w.isVisited(x+1, y) && !w.hasBreeze(x+1, y)){
+            return 0;
+        }else if(w.isVisited(x, y-1) && !w.hasBreeze(x, y-1)){
+            return 0;
+        }else if(w.isVisited(x-1, y) && !w.hasBreeze(x-1, y)){
+            return 0;
+        }
+        
         int danger = 0;
         if(!w.isValidPosition(x, y+1) || !w.isVisited(x, y+1)){
             danger++;
@@ -111,6 +54,7 @@ public class MyAgent implements Agent
         if(!w.isValidPosition(x-1, y) || !w.isVisited(x-1, y)){
             danger++;
         }
+        
         
         if(w.hasBreeze(x, y+1)){
             danger=danger+2; 
@@ -176,29 +120,125 @@ public class MyAgent implements Agent
         }
         
         if(w.hasStench(x, y+1)){
-            wumpusDanger++; 
-            wumpusDanger++; 
-            wumpusDanger++; 
+            wumpusDanger+=7; 
+           
         }
         if(w.hasStench(x+1, y)){
-            wumpusDanger++;
-            wumpusDanger++; 
-            wumpusDanger++; 
+            wumpusDanger+=7;
         }
         if(w.hasStench(x, y-1)){
-            wumpusDanger++;
-            wumpusDanger++; 
-            wumpusDanger++; 
+             wumpusDanger+=7;
         }
         if(w.hasStench(x-1, y)){
-            wumpusDanger++; 
-            wumpusDanger++; 
-            wumpusDanger++; 
+            wumpusDanger+=7;
         }
         
         return wumpusDanger;
     }
     
+    public void avoidPit(){
+        System.out.println("Inside ShitFlag");
+            this.stillMoving = false;
+            this.Path.clear();
+            int safety1=1000;
+            int safety2=1000;
+            int safety3=1000;
+            int safety4=1000;
+            int bestx = 0;
+            int besty = 0;
+            
+            int X = w.getPlayerX();
+            int Y = w.getPlayerY();
+        
+            if(!w.isVisited(X, Y+1)  && w.isValidPosition(X, Y+1)){
+                safety1 = pitDanger(w, X, Y+1);
+                bestx = X;
+                besty = Y+1;
+            }
+            if(!w.isVisited(X, Y-1)  && w.isValidPosition(X, Y-1)){
+                safety2 = pitDanger(w, X, Y-1);
+                if(safety2<safety1){
+                   bestx = X;
+                    besty = Y-1; 
+                    safety1 = safety2;
+                }
+            }
+            if(!w.isVisited(X+1, Y) && w.isValidPosition(X+1, Y)){
+                safety3 = pitDanger(w, X+1, Y);
+                if(safety3<safety1){
+                   bestx = X+1;
+                    besty = Y; 
+                    safety1 = safety3;
+                }
+            }
+            if(!w.isVisited(X-1, Y) && w.isValidPosition(X-1, Y)){
+                safety4 = pitDanger(w, X-1, Y);
+                if(safety4<safety1){
+                   bestx = X-1;
+                    besty = Y; 
+                }
+            }
+            
+            if(X+1 == bestx && Y == besty){
+                    w.turnRight();
+                    w.moveForward();
+                    System.out.println("right");
+
+                }else if(X-1 == bestx && Y == besty){
+                    w.turnLeft();
+                    w.moveForward();
+                    System.out.println("left");
+
+                }else if(X == bestx && Y+1 == besty){
+                    w.turnUp();
+                    w.moveForward();
+                    System.out.println("up");
+
+                }else if(X == bestx && Y-1 == besty){
+                    w.turnDown();
+                    w.moveForward();
+                    System.out.println("down");
+
+                }else{
+                    System.out.println("shit happened");
+                }
+            int xx = w.getPlayerX();
+            int yy = w.getPlayerY();
+            if(this.possibleMoves.indexOf(4*xx+yy) !=-1){
+                this.possibleMoves.remove(this.possibleMoves.indexOf(4*xx+yy));
+            }
+            if(w.isValidPosition(xx+1, yy) && !w.isVisited(xx+1, yy)){
+                if(this.possibleMoves.indexOf(4*(xx+1)+yy)== -1){
+                    this.possibleMoves.add(4*(xx+1)+yy);
+//                    System.out.println("Added:"+(4*(xx+1)+yy));
+                }
+               
+            }
+            if(w.isValidPosition(xx-1, yy) && !w.isVisited(xx-1, yy)){
+                if(this.possibleMoves.indexOf(4*(xx-1)+yy)== -1){
+                    this.possibleMoves.add(4*(xx-1)+yy);
+//                    System.out.println("Added:"+(4*(xx-1)+yy));
+                }
+                
+            }
+            if(w.isValidPosition(xx, yy+1) && !w.isVisited(xx, yy+1)){
+                if(this.possibleMoves.indexOf(4*(xx)+yy+1)== -1){
+                    this.possibleMoves.add(4*(xx)+yy+1);
+//                    System.out.println("Added:"+(4*(xx)+yy+1));
+                }
+                
+            }
+            if(w.isValidPosition(xx, yy-1) && !w.isVisited(xx, yy-1)){
+                if(this.possibleMoves.indexOf(4*(xx)+yy-1)== -1){
+                    this.possibleMoves.add(4*(xx)+yy-1);
+//                    System.out.println("Added:"+(4*(xx)+yy-1));
+                }
+                
+            }
+//            this.shitFlag = false;
+//            this.obstruction == true;
+            return;
+    }
     public void constructPath(int start, int destination){
         if(start-4 == destination || start+4 == destination||start+1 == destination||start-1 == destination){
             System.out.println("start: "+start+" dest: "+destination);
@@ -328,7 +368,7 @@ public class MyAgent implements Agent
 //            System.out.println("sX:"+sX+" | sY:"+sY+" | dX:"+dX+" | dY:"+dY);
             if(sX - dX < 0){
                 if(w.isVisited(sX+1, sY) && this.Path.contains(4*(sX+1)+sY)==false && !w.hasPit(sX+1, sY)){
-                    tempVal = 4*(sX+1)+sY+1;
+                    tempVal = 4*(sX+1)+sY;
                     this.Path.add(tempVal);
                     System.out.println("adding1: "+tempVal);
                     if(tempVal-4 == destination || tempVal+4 == destination||tempVal+1 == destination||tempVal-1 == destination){
@@ -467,7 +507,8 @@ public class MyAgent implements Agent
             }else{
                 System.out.println("shit");
                 this.shitFlag = true;
-                doAction();
+//                doAction();
+                avoidPit();
                 return;
             }
         }
@@ -530,10 +571,6 @@ public class MyAgent implements Agent
             xx--;
         }
         
-        if(firstVal==20){
-            xx--;
-            yy++;
-        }
         
         
         if(X == xx){
@@ -553,7 +590,12 @@ public class MyAgent implements Agent
                 w.moveForward();
             }
         }else{
+            
             System.out.println("X:"+X+" |Y:"+Y+" | xx:"+xx+" |yy:"+yy);
+            
+            this.shitFlag = true;
+                avoidPit();
+                return;
         }
         this.Path.remove(0);
         if(this.possibleMoves.indexOf(firstVal) !=-1){
@@ -571,10 +613,19 @@ public class MyAgent implements Agent
     public void doAction()
     {
         
+        System.out.println("********************");
         //Location of the player
         int X = w.getPlayerX();
         int Y = w.getPlayerY();
-        
+        if(w.hasBreeze(1, 1) && !w.hasStench(1, 1) && X ==1 && Y == 1){
+            w.turnUp();
+            w.moveForward();
+            this.possibleMoves.remove(this.possibleMoves.indexOf(6));
+            this.possibleMoves.add(7);
+            this.possibleMoves.add(10);
+            
+            return;
+        }
         //Grab Gold if we can.
         if (w.hasGlitter(X, Y))
         {
@@ -594,97 +645,14 @@ public class MyAgent implements Agent
             this.stillMoving = true;
             
         }
-        if(this.shitFlag){
-            this.stillMoving = false;
-            this.Path.clear();
-            int safety1=1000;
-            int safety2=1000;
-            int safety3=1000;
-            int safety4=1000;
-            int bestx = 0;
-            int besty = 0;
-            if(!w.isVisited(X, Y+1)){
-                safety1 = pitDanger(w, X, Y+1);
-                bestx = X;
-                besty = Y+1;
-            }
-            if(!w.isVisited(X, Y-1)){
-                safety2 = pitDanger(w, X, Y-1);
-                if(safety2<safety1){
-                   bestx = X;
-                    besty = Y-1; 
-                    safety1 = safety2;
-                }
-            }
-            if(!w.isVisited(X+1, Y)){
-                safety3 = pitDanger(w, X+1, Y);
-                if(safety3<safety1){
-                   bestx = X+1;
-                    besty = Y; 
-                    safety1 = safety3;
-                }
-            }
-            if(!w.isVisited(X-1, Y)){
-                safety4 = pitDanger(w, X-1, Y);
-                if(safety4<safety1){
-                   bestx = X-1;
-                    besty = Y; 
-                }
-            }
-            
-            if(X+1 == bestx && Y == besty){
-                    w.turnRight();
-                    w.moveForward();
-
-                }else if(X-1 == bestx && Y == besty){
-                    w.turnLeft();
-                    w.moveForward();
-
-                }else if(X == bestx && Y+1 == besty){
-                    w.turnUp();
-                    w.moveForward();
-
-                }else if(X == bestx && Y-1 == besty){
-                    w.turnDown();
-                    w.moveForward();
-
-                }
-            int xx = w.getPlayerX();
-            int yy = w.getPlayerY();
-            if(w.isValidPosition(xx+1, yy) && !w.isVisited(xx+1, yy)){
-                if(this.possibleMoves.indexOf(4*(xx+1)+yy)== -1){
-                    this.possibleMoves.add(4*(xx+1)+yy);
-//                    System.out.println("Added:"+(4*(xx+1)+yy));
-                }
-               
-            }
-            if(w.isValidPosition(xx-1, yy) && !w.isVisited(xx-1, yy)){
-                if(this.possibleMoves.indexOf(4*(xx-1)+yy)== -1){
-                    this.possibleMoves.add(4*(xx-1)+yy);
-//                    System.out.println("Added:"+(4*(xx-1)+yy));
-                }
-                
-            }
-            if(w.isValidPosition(xx, yy+1) && !w.isVisited(xx, yy+1)){
-                if(this.possibleMoves.indexOf(4*(xx)+yy+1)== -1){
-                    this.possibleMoves.add(4*(xx)+yy+1);
-//                    System.out.println("Added:"+(4*(xx)+yy+1));
-                }
-                
-            }
-            if(w.isValidPosition(xx, yy-1) && !w.isVisited(xx, yy-1)){
-                if(this.possibleMoves.indexOf(4*(xx)+yy-1)== -1){
-                    this.possibleMoves.add(4*(xx)+yy-1);
-//                    System.out.println("Added:"+(4*(xx)+yy-1));
-                }
-                
-            }
-            this.shitFlag = false;
-            return;
-        }
+//        if(this.shitFlag){
+//            
+//        }
         if(this.stillMoving){
+            System.out.println("Making a move from the constructed path!");
             makeMove();
         }else{
+            System.out.println("Taking the best move");
             int safety =0;
             int tempSafety =1000;
             int bestMove = 0;
@@ -701,10 +669,7 @@ public class MyAgent implements Agent
                     y=4;
                     x--;
                 }
-                if(val==20){
-                    x--;
-                    y++;
-                }
+                
                 if(w.wumpusAlive()){
                     wumpusSafety = wumpusDanger(w, x, y);
                 }else{
@@ -726,9 +691,9 @@ public class MyAgent implements Agent
                 int shootX = shootMove/4;
                 int shootY = shootMove%4;
                 
-                if(shootMove==20){
+                if(shootY==0){
                     shootX--;
-                    shootY++;
+                    shootY=4;
                 }
 
                 if(X+1 == shootX && Y == shootY){
@@ -753,18 +718,23 @@ public class MyAgent implements Agent
                 System.out.println("Best move:"+bestMove);
     //            System.out.println("constructing the path");
                 constructPath(4*X+Y, bestMove);
-//                if(this.shitFlag == true){
-//                    this.shitFlag = false;
+//                if(this.obstruction == true){
+////                    this.shitFlag = false;
+//                        this.obstruction = false;
 //                    return;
 //                }
+                if(this.shitFlag){
+                    this.shitFlag = false;
+                    return;
+                }
                 this.Path.add(bestMove);
                 System.out.println("Added:"+bestMove);
                 
                 int bestX = bestMove/4;
                 int bestY = bestMove%4;
-                if(bestMove == 20){
+                if(bestY == 0){
                     bestX--;
-                    bestY++;
+                    bestY=4;
                 }
                 int moveIndex = this.possibleMoves.indexOf(bestMove);
                 int pathIndex = this.Path.indexOf(bestMove);
@@ -793,6 +763,7 @@ public class MyAgent implements Agent
                     this.possibleMoves.remove(moveIndex);
                     this.Path.remove(pathIndex);
                 }else{
+                    System.out.println("Making a move ");
                     makeMove();                    
                 }
             }
