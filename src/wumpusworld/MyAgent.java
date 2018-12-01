@@ -15,6 +15,7 @@ public class MyAgent implements Agent
     ArrayList<Integer> possibleMoves = new ArrayList<Integer>();
     ArrayList<Integer> Path = new ArrayList<Integer>();
     boolean stillMoving = false;
+    boolean shitFlag = false;
     /**
      * Creates a new instance of your solver agent.
      * 
@@ -200,14 +201,31 @@ public class MyAgent implements Agent
     
     public void constructPath(int start, int destination){
         if(start-4 == destination || start+4 == destination||start+1 == destination||start-1 == destination){
+            System.out.println("start: "+start+" dest: "+destination);
             return;
         }
         
         int sX = start/4;
         int sY = start%4;
+        if(sY==0){
+            sY=4;
+            sX--;
+        }
+        if(start == 20){
+            sX--;
+            sY++;
+        }
         
         int dX = destination/4;
         int dY = destination%4;
+        if(dY==0){
+            dY=4;
+            dX--;
+        }
+        if(destination == 20){
+            dX--;
+            dY++;
+        }
         int tempVal;
 //        System.out.println("COnstructing");
 //        System.out.println(start+":"+destination);
@@ -220,7 +238,7 @@ public class MyAgent implements Agent
         if(sX == dX){
             System.out.println(sY+"X==X"+dY);
             if(sY-dY <0){
-                if(w.isVisited(sX, sY + 1) && this.Path.contains(4*sX+sY+1)==false){
+                if(w.isVisited(sX, sY + 1) && this.Path.contains(4*sX+sY+1)==false && !w.hasPit(sX, sY + 1)){
                     tempVal = 4*sX+sY+1;
                     this.Path.add(tempVal);
                     System.out.println("adding: "+tempVal);
@@ -231,7 +249,7 @@ public class MyAgent implements Agent
                     System.out.println("1");
                     constructPath(tempVal, destination);
                     return;
-                }else if(w.isVisited(sX+1, sY) && this.Path.contains(4*(sX+1)+sY)==false){
+                }else if(w.isVisited(sX+1, sY) && this.Path.contains(4*(sX+1)+sY)==false && !w.hasPit(sX+1, sY)){
                     tempVal = 4*(sX+1)+sY;
                     this.Path.add(tempVal);
                     System.out.println("adding: "+tempVal);
@@ -239,11 +257,9 @@ public class MyAgent implements Agent
                         return;
                     }
                     System.out.println(this.Path);
-                                        System.out.println("2");
-
                     constructPath(tempVal, destination);
                     return;
-                }else if(w.isVisited(sX, sY-1) && this.Path.contains(4*(sX)+sY-1)==false){
+                }else if(w.isVisited(sX, sY-1) && this.Path.contains(4*(sX)+sY-1)==false && !w.hasPit(sX, sY - 1)){
                     tempVal = 4*(sX)+sY-1;
                     this.Path.add(tempVal);
                     System.out.println("adding: "+tempVal);
@@ -253,19 +269,18 @@ public class MyAgent implements Agent
                     System.out.println("3");
                     constructPath(tempVal, destination);
                     return;
-                }else if(w.isVisited(sX-1, sY) && this.Path.contains(4*(sX-1)+sY)==false){
+                }else if(w.isVisited(sX-1, sY) && this.Path.contains(4*(sX-1)+sY)==false && !w.hasPit(sX-1, sY)){
                     tempVal = 4*(sX-1)+sY;
                     this.Path.add(tempVal);
                     System.out.println("adding: "+tempVal);
                     if(tempVal-4 == destination || tempVal+4 == destination||tempVal+1 == destination||tempVal-1 == destination){
                         return;
                     }
-                    System.out.println("4");
                     constructPath(tempVal, destination);
                     return;
                 }
             }else if(sY-dY >0){
-                if(w.isVisited(sX-1, sY) && this.Path.contains(4*(sX-1)+sY)==false){
+                if(w.isVisited(sX-1, sY) && this.Path.contains(4*(sX-1)+sY)==false && !w.hasPit(sX-1, sY)){
                     tempVal = 4*(sX-1)+sY;
                     this.Path.add(tempVal);
                     System.out.println("adding: "+tempVal);
@@ -275,7 +290,7 @@ public class MyAgent implements Agent
 //                    this.Path.add(tempVal);
                     constructPath(tempVal, destination);
                     return;
-                }else if(w.isVisited(sX, sY-1) && this.Path.contains(4*(sX)+sY-1)==false){
+                }else if(w.isVisited(sX, sY-1) && this.Path.contains(4*(sX)+sY-1)==false && !w.hasPit(sX, sY-1)){
                     tempVal = 4*(sX)+sY-1;
                     this.Path.add(tempVal);
                     System.out.println("adding: "+tempVal);
@@ -285,7 +300,7 @@ public class MyAgent implements Agent
 //                    this.Path.add(tempVal);
                     constructPath(tempVal, destination);
                     return;
-                }else if(w.isVisited(sX+1, sY) && this.Path.contains(4*(sX+1)+sY)==false){
+                }else if(w.isVisited(sX+1, sY) && this.Path.contains(4*(sX+1)+sY)==false && !w.hasPit(sX-1, sY)){
                     tempVal = 4*(sX+1)+sY;
                     this.Path.add(tempVal);
                     System.out.println("adding: "+tempVal);
@@ -295,7 +310,7 @@ public class MyAgent implements Agent
 //                    this.Path.add(tempVal);
                     constructPath(tempVal, destination);
                     return;
-                }else if(w.isVisited(sX, sY + 1) && this.Path.contains(4*sX+sY+1)==false){
+                }else if(w.isVisited(sX, sY + 1) && this.Path.contains(4*sX+sY+1)==false && !w.hasPit(sX, sY+1)){
                     tempVal = 4*sX+sY+1; 
                     this.Path.add(tempVal);
                     System.out.println("adding: "+tempVal);
@@ -309,20 +324,22 @@ public class MyAgent implements Agent
                 
             }
         }else if(sY == dY){
+            System.out.println(sY+"Y==Y"+dY);
 //            System.out.println("sX:"+sX+" | sY:"+sY+" | dX:"+dX+" | dY:"+dY);
             if(sX - dX < 0){
-                if(w.isVisited(sX, sY + 1) && this.Path.contains(4*sX+sY+1)==false){
-                    tempVal = 4*sX+sY+1;
+                if(w.isVisited(sX+1, sY) && this.Path.contains(4*(sX+1)+sY)==false && !w.hasPit(sX+1, sY)){
+                    tempVal = 4*(sX+1)+sY+1;
                     this.Path.add(tempVal);
                     System.out.println("adding1: "+tempVal);
                     if(tempVal-4 == destination || tempVal+4 == destination||tempVal+1 == destination||tempVal-1 == destination){
+                        System.out.println("i returned");
                         return;
                     }
-//                    this.Path.add(tempVal);
+//                    this.Path.add(tempVal);4rd place
                     constructPath(tempVal, destination);
                     return;
-                }else if(w.isVisited(sX+1, sY) && this.Path.contains(4*(sX+1)+sY)==false){
-                    tempVal = 4*(sX+1)+sY;
+                }else if(w.isVisited(sX, sY+1) && this.Path.contains(4*(sX)+sY+1)==false && !w.hasPit(sX, sY+1)){
+                    tempVal = 4*(sX)+sY+1;
                     this.Path.add(tempVal);
                     System.out.println("adding2: "+tempVal);
                     if(tempVal-4 == destination || tempVal+4 == destination||tempVal+1 == destination||tempVal-1 == destination){
@@ -331,7 +348,7 @@ public class MyAgent implements Agent
 //                    this.Path.add(tempVal);
                     constructPath(tempVal, destination);
                     return;
-                }else if(w.isVisited(sX-1, sY) && this.Path.contains(4*(sX-1)+sY)==false){
+                }else if(w.isVisited(sX-1, sY) && this.Path.contains(4*(sX-1)+sY)==false && !w.hasPit(sX-1, sY)){
                     tempVal = 4*(sX-1)+sY;
                     this.Path.add(tempVal);
                     System.out.println("adding3: "+tempVal);
@@ -341,7 +358,7 @@ public class MyAgent implements Agent
 //                    this.Path.add(tempVal);
                     constructPath(tempVal, destination);
                     return;
-                }else if(w.isVisited(sX, sY-1) && this.Path.contains(4*(sX)+sY-1)==false){
+                }else if(w.isVisited(sX, sY-1) && this.Path.contains(4*(sX)+sY-1)==false && !w.hasPit(sX, sY-1)){
                     System.out.println("sX:"+sX+" | sY:"+sY+" | dX:"+dX+" | dY:"+dY);
                     tempVal = 4*(sX)+sY-1;
                     this.Path.add(tempVal);
@@ -354,7 +371,8 @@ public class MyAgent implements Agent
                     return;
                 }
             }else if(sX - dX > 0){
-                if(w.isVisited(sX, sY-1) && this.Path.contains(4*(sX)+sY-1)==false){
+                System.out.println("3rd place");
+                if(w.isVisited(sX, sY-1) && this.Path.contains(4*(sX)+sY-1)==false && !w.hasPit(sX, sY-1)){
                     tempVal = 4*(sX)+sY-1;
                     this.Path.add(tempVal);
                     System.out.println("adding5: "+tempVal);
@@ -364,7 +382,7 @@ public class MyAgent implements Agent
 //                    this.Path.add(tempVal);
                     constructPath(tempVal, destination);
                     return;
-                }else if(w.isVisited(sX+1, sY) && this.Path.contains(4*(sX+1)+sY)==false){
+                }else if(w.isVisited(sX+1, sY) && this.Path.contains(4*(sX+1)+sY)==false && !w.hasPit(sX+1, sY)){
                     tempVal = 4*(sX+1)+sY;
                     this.Path.add(tempVal);
                     System.out.println("adding6: "+tempVal);
@@ -374,7 +392,7 @@ public class MyAgent implements Agent
 //                    this.Path.add(tempVal);
                     constructPath(tempVal, destination);
                     return;
-                }else if(w.isVisited(sX-1, sY) && this.Path.contains(4*(sX-1)+sY)==false){
+                }else if(w.isVisited(sX-1, sY) && this.Path.contains(4*(sX-1)+sY)==false && !w.hasPit(sX-1, sY)){
                     tempVal = 4*(sX-1)+sY;
                     this.Path.add(tempVal);
                     System.out.println("adding7: "+tempVal);
@@ -384,7 +402,7 @@ public class MyAgent implements Agent
 //                    this.Path.add(tempVal);
                     constructPath(tempVal, destination);
                     return;
-                }else if(w.isVisited(sX, sY + 1) && this.Path.contains(4*sX+sY+1)==false){
+                }else if(w.isVisited(sX, sY + 1) && this.Path.contains(4*sX+sY+1)==false && !w.hasPit(sX, sY+1)){
                     tempVal = 4*sX+sY+1;
                     this.Path.add(tempVal);
                     System.out.println("adding8: "+tempVal);
@@ -397,48 +415,61 @@ public class MyAgent implements Agent
                 }
             }
         }else{
-            if(w.isVisited(sX, sY-1) && this.Path.contains( 4*(sX)+sY-1)==false){
-                    tempVal = 4*(sX)+sY-1;
-                    this.Path.add(tempVal);
-                    System.out.println("adding9: "+tempVal);
-                    if(tempVal-4 == destination || tempVal+4 == destination||tempVal+1 == destination||tempVal-1 == destination){
-                        return;
-                    }
-                    
-                    System.out.println(this.Path);
-                    constructPath(tempVal, destination);
-                    return;
-                }else if(w.isVisited(sX+1, sY) && this.Path.contains(4*(sX+1)+sY)==false){
-                    tempVal = 4*(sX+1)+sY;
-                    this.Path.add(tempVal);
-                    System.out.println("adding10: "+tempVal);
-                    if(tempVal-4 == destination || tempVal+4 == destination||tempVal+1 == destination||tempVal-1 == destination){
-                        return;
-                    }
-//                    this.Path.add(tempVal);System.out.println(this.Path);
-                    constructPath(tempVal, destination);
-                    return;
-                }else if(w.isVisited(sX-1, sY) && this.Path.contains(4*(sX-1)+sY)==false){
-                    tempVal = 4*(sX-1)+sY;
-                    this.Path.add(tempVal);
-                    System.out.println("adding11: "+tempVal);
-                    if(tempVal-4 == destination || tempVal+4 == destination||tempVal+1 == destination||tempVal-1 == destination){
-                        return;
-                    }
-//                    this.Path.add(tempVal);System.out.println(this.Path);
-                    constructPath(tempVal, destination);
-                    return;
-                }else if(w.isVisited(sX, sY + 1) && this.Path.contains(4*sX+sY+1)==false){
-                    tempVal = 4*sX+sY+1;
-                    this.Path.add(tempVal);
-                    System.out.println("adding12: "+tempVal);
-                    if(tempVal-4 == destination || tempVal+4 == destination||tempVal+1 == destination||tempVal-1 == destination){
-                        return;
-                    }
-//                    this.Path.add(tempVal);System.out.println(this.Path);
-                    constructPath(tempVal, destination);
+            System.out.println("4rd place");
+            if(w.isVisited(sX, sY-1)){
+                System.out.println("yes");
+            }
+            if(this.Path.contains(4*(sX)+sY-1)==true){
+                System.out.println(4*(sX)+sY-1);
+                System.out.println(this.Path);
+            }
+            if(w.isVisited(sX, sY-1) && this.Path.contains(4*(sX)+sY-1)==false && !w.hasPit(sX, sY-1)){
+                tempVal = 4*(sX)+sY-1;
+                this.Path.add(tempVal);
+                System.out.println("adding9: "+tempVal);
+                if(tempVal-4 == destination || tempVal+4 == destination||tempVal+1 == destination||tempVal-1 == destination){
                     return;
                 }
+
+                System.out.println(this.Path);
+                constructPath(tempVal, destination);
+                return;
+            }else if(w.isVisited(sX+1, sY) && this.Path.contains(4*(sX+1)+sY)==false && !w.hasPit(sX+1, sY)){
+                tempVal = 4*(sX+1)+sY;
+                this.Path.add(tempVal);
+                System.out.println("adding10: "+tempVal);
+                if(tempVal-4 == destination || tempVal+4 == destination||tempVal+1 == destination||tempVal-1 == destination){
+                    return;
+                }
+//                    this.Path.add(tempVal);System.out.println(this.Path);
+                constructPath(tempVal, destination);
+                return;
+            }else if(w.isVisited(sX-1, sY) && this.Path.contains(4*(sX-1)+sY)==false && !w.hasPit(sX-1, sY)){
+                tempVal = 4*(sX-1)+sY;
+                this.Path.add(tempVal);
+                System.out.println("adding11: "+tempVal);
+                if(tempVal-4 == destination || tempVal+4 == destination||tempVal+1 == destination||tempVal-1 == destination){
+                    return;
+                }
+//                    this.Path.add(tempVal);System.out.println(this.Path);
+                constructPath(tempVal, destination);
+                return;
+            }else if(w.isVisited(sX, sY + 1) && this.Path.contains(4*sX+sY+1)==false && !w.hasPit(sX, sY + 1)){
+                tempVal = 4*sX+sY+1;
+                this.Path.add(tempVal);
+                System.out.println("adding12: "+tempVal);
+                if(tempVal-4 == destination || tempVal+4 == destination||tempVal+1 == destination||tempVal-1 == destination){
+                    return;
+                }
+//                    this.Path.add(tempVal);System.out.println(this.Path);
+                constructPath(tempVal, destination);
+                return;
+            }else{
+                System.out.println("shit");
+                this.shitFlag = true;
+                doAction();
+                return;
+            }
         }
         
     }
@@ -446,6 +477,16 @@ public class MyAgent implements Agent
     public void addPossibleMoves(int value){
         int xx = value/4;
         int yy = value%4;
+        
+        if(yy==0){
+            yy=4;
+            xx--;
+        }
+        
+        if(value==20){
+            xx--;
+            yy++;
+        }
         
             if(w.isValidPosition(xx+1, yy) && !w.isVisited(xx+1, yy)){
                 if(this.possibleMoves.indexOf(4*(xx+1)+yy)== -1){
@@ -484,6 +525,17 @@ public class MyAgent implements Agent
         int Y = w.getPlayerY();
         int xx = firstVal/4;
         int yy = firstVal%4;
+        if(yy==0){
+            yy=4;
+            xx--;
+        }
+        
+        if(firstVal==20){
+            xx--;
+            yy++;
+        }
+        
+        
         if(X == xx){
             if(Y - yy > 0){
                 w.turnDown();
@@ -542,39 +594,66 @@ public class MyAgent implements Agent
             this.stillMoving = true;
             
         }
+        if(this.shitFlag){
+            this.stillMoving = false;
+            this.Path.clear();
+            int safety1=1000;
+            int safety2=1000;
+            int safety3=1000;
+            int safety4=1000;
+            int bestx = 0;
+            int besty = 0;
+            if(!w.isVisited(X, Y+1)){
+                safety1 = pitDanger(w, X, Y+1);
+                bestx = X;
+                besty = Y+1;
+            }
+            if(!w.isVisited(X, Y-1)){
+                safety2 = pitDanger(w, X, Y-1);
+                if(safety2<safety1){
+                   bestx = X;
+                    besty = Y-1; 
+                    safety1 = safety2;
+                }
+            }
+            if(!w.isVisited(X+1, Y)){
+                safety3 = pitDanger(w, X+1, Y);
+                if(safety3<safety1){
+                   bestx = X+1;
+                    besty = Y; 
+                    safety1 = safety3;
+                }
+            }
+            if(!w.isVisited(X-1, Y)){
+                safety4 = pitDanger(w, X-1, Y);
+                if(safety4<safety1){
+                   bestx = X-1;
+                    besty = Y; 
+                }
+            }
+            
+            if(X+1 == bestx && Y == besty){
+                    w.turnRight();
+                    w.moveForward();
+
+                }else if(X-1 == bestx && Y == besty){
+                    w.turnLeft();
+                    w.moveForward();
+
+                }else if(X == bestx && Y+1 == besty){
+                    w.turnUp();
+                    w.moveForward();
+
+                }else if(X == bestx && Y-1 == besty){
+                    w.turnDown();
+                    w.moveForward();
+;
+                }
+//            this.shitFlag = false;
+            return;
+        }
         if(this.stillMoving){
             makeMove();
-//            System.out.println("I am moving");
-//            int firstVal = this.Path.get(0);
-//            int xx = firstVal/4;
-//            int yy = firstVal%4;
-//            if(X == xx){
-//                if(Y - yy > 0){
-//                    w.turnDown();
-//                    w.moveForward();
-//                }else if(Y - yy < 0){
-//                    w.turnUp();
-//                    w.moveForward();
-//                }
-//            }else if(Y == yy){
-//                if(X - xx > 0){
-//                    w.turnLeft();
-//                    w.moveForward();
-//                }else if(X - xx < 0){
-//                    w.turnRight();
-//                    w.moveForward();
-//                }
-//            }else{
-//                System.out.println("X:"+X+" |Y:"+Y+" | xx:"+xx+" |yy:"+yy);
-//            }
-//            this.Path.remove(0);
-//            if(this.possibleMoves.indexOf(firstVal) !=-1){
-//                this.possibleMoves.remove(this.possibleMoves.indexOf(firstVal));
-//            }else{
-//                System.out.println(firstVal);
-//            }
-//            
-//            addPossibleMoves(firstVal);
         }else{
             int safety =0;
             int tempSafety =1000;
@@ -584,8 +663,18 @@ public class MyAgent implements Agent
             for (int i = 0; i < this.possibleMoves.size(); i++) {
                 int val = this.possibleMoves.get(i);
 
-                int x = val/4;
+//                int x = val/4;
+//                int y = val%4;
+                int x = (val/4); 
                 int y = val%4;
+                if(y==0){
+                    y=4;
+                    x--;
+                }
+                if(val==20){
+                    x--;
+                    y++;
+                }
                 if(w.wumpusAlive()){
                     wumpusSafety = wumpusDanger(w, x, y);
                 }else{
@@ -601,11 +690,16 @@ public class MyAgent implements Agent
                     bestMove = val;
                     tempSafety = pitSafety+wumpusSafety;
                 }
-                System.out.println(x+","+y+":"+(pitSafety+wumpusSafety));
+                System.out.println("val: "+val+" | "+x+","+y+":"+(pitSafety+wumpusSafety));
             }
             if(wumpusSafety == 100){
                 int shootX = shootMove/4;
                 int shootY = shootMove%4;
+                
+                if(shootMove==20){
+                    shootX--;
+                    shootY++;
+                }
 
                 if(X+1 == shootX && Y == shootY){
                     w.turnRight();
@@ -629,11 +723,19 @@ public class MyAgent implements Agent
                 System.out.println("Best move:"+bestMove);
     //            System.out.println("constructing the path");
                 constructPath(4*X+Y, bestMove);
+                if(this.shitFlag == true){
+                    this.shitFlag = false;
+                    return;
+                }
                 this.Path.add(bestMove);
                 System.out.println("Added:"+bestMove);
                 
                 int bestX = bestMove/4;
                 int bestY = bestMove%4;
+                if(bestMove == 20){
+                    bestX--;
+                    bestY++;
+                }
                 int moveIndex = this.possibleMoves.indexOf(bestMove);
                 int pathIndex = this.Path.indexOf(bestMove);
                 if(X+1 == bestX && Y == bestY){
@@ -661,42 +763,10 @@ public class MyAgent implements Agent
                     this.possibleMoves.remove(moveIndex);
                     this.Path.remove(pathIndex);
                 }else{
-                    makeMove();
-//                    int firstVal = this.Path.get(0);
-//                    int xx = firstVal/4;
-//                    int yy = firstVal%4;
-//                    if(X == xx){
-//                        if(Y - yy > 0){
-//                            w.turnDown();
-//                            w.moveForward();
-//                        }else if(Y - yy < 0){
-//                            w.turnUp();
-//                            w.moveForward();
-//                        }
-//                    }else if(Y == yy){
-//                        if(X - xx > 0){
-//                            w.turnLeft();
-//                            w.moveForward();
-//                        }else if(X - xx < 0){
-//                            w.turnRight();
-//                            w.moveForward();
-//                        }
-//                    }else{
-//                        System.out.println("X:"+X+" |Y:"+Y+" | xx:"+xx+" |yy:"+yy);
-//                    }
-//                    this.Path.remove(0);
-//                    if(this.possibleMoves.indexOf(firstVal) !=-1){
-//                        this.possibleMoves.remove(this.possibleMoves.indexOf(firstVal));
-//                    }else{
-//                        System.out.println(firstVal);
-//                    }
-//
-//                    addPossibleMoves(firstVal);
+                    makeMove();                    
                 }
             }
-////            moveTo(bestMove);
-
-            
+        
         }
         System.out.println("Path:"+this.Path);
         System.out.println("Possible Moves"+this.possibleMoves);
